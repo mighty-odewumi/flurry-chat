@@ -11,6 +11,7 @@ import SignUp from './auth/SignUp';
 import SignOut from './auth/SignOut';
 import SignIn from './auth/SignIn';
 import SendEmailVerification from "./auth/SendEmailVerification";
+import GetUserProfile from "./auth/GetUserProfile";
 
 
 export default function App() {
@@ -54,6 +55,9 @@ export default function App() {
       <SendEmailVerification />
 
       <SignOut />
+
+      <GetUserProfile />
     </>
   )
 }
+

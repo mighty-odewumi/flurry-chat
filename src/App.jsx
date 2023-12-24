@@ -7,11 +7,12 @@ import { initializeApp } from "firebase/app";
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 import { getAuth } from "firebase/auth";
-import SignUp from './auth/SignUp';
-import SignOut from './auth/SignOut';
-import SignIn from './auth/SignIn';
-import SendEmailVerification from "./auth/SendEmailVerification";
-import GetUserProfile from "./auth/GetUserProfile";
+import SplashScreen from "./pages/splashScreen";
+// import SignUp from './auth/SignUp';
+// import SignOut from './auth/SignOut';
+// import SignIn from './auth/SignIn';
+// import SendEmailVerification from "./auth/SendEmailVerification";
+// import GetUserProfile from "./auth/GetUserProfile";
 
 
 export default function App() {
@@ -35,28 +36,13 @@ export default function App() {
   // eslint-disable-next-line no-unused-vars
   const auth = getAuth(app);
 
-  const email = "joshuastoneage@gmail.com";
-  const password = "harmon13";
+  // const email = "joshuastoneage@gmail.com";
+  // const password = "harmon13";
 
   return (
     <>
-      <h1>Firebase Auth Tests </h1>
+      <SplashScreen />
       
-      <SignUp 
-        email={email}
-        password={password}
-      />
-
-      <SignIn 
-        email={email}
-        password={password}
-      />
-
-      <SendEmailVerification />
-
-      <SignOut />
-
-      <GetUserProfile />
     </>
   )
 }

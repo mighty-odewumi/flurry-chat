@@ -4,7 +4,6 @@ import {
   createBrowserRouter,
   Route,
   RouterProvider,
-  Routes,
 } from "react-router-dom";
 
 
@@ -22,8 +21,9 @@ import { getAuth } from "firebase/auth";
 // import GetUserProfile from "./auth/GetUserProfile";
 
 // Import pages
-import SplashScreen from "./pages/SplashScreen";
+import SplashScreen, { loader as splashLoader } from "./pages/SplashScreen";
 import SignInPage from "./pages/authPages/SignInPage";
+import AuthRequired from "./pages/authPages/AuthRequired";
 
 
 export default function App() {
@@ -31,14 +31,15 @@ export default function App() {
   // Your web app's Firebase configuration
   // For Firebase JS SDK v7.20.0 and later, measurementId is optional
   const firebaseConfig = {
-    apiKey: "AIzaSyDjq7WxIwA57mQNvFkQMc5i_HWzgpgbKK4",
-    authDomain: "flurry-chat.firebaseapp.com",
-    projectId: "flurry-chat",
-    storageBucket: "flurry-chat.appspot.com",
-    messagingSenderId: "656015662138",
-    appId: "1:656015662138:web:83be04d53de81cf091a903",
-    measurementId: "G-B04CX4B4BB"
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: import.meta.VITE_FIREBASE_MESSAGING_SENDER_ID,
+    appId: import.meta.env.VITE_FIREBASE_APP_ID,
+    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
   };
+
 
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
@@ -55,11 +56,23 @@ export default function App() {
       <Route 
         path="/" 
         element={<SplashScreen />} 
+        loader={splashLoader}
       />
       <Route 
         path="/signin" 
         element={<SignInPage />} 
+        
       />
+
+      <Route 
+        path=""
+        element={<AuthRequired />}
+      >
+        <Route 
+          path="/chats"
+        />
+      </Route>
+      
     </>
   ));
   

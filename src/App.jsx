@@ -1,18 +1,29 @@
 // import { useState } from 'react';
+import { 
+  createRoutesFromElements,
+  createBrowserRouter,
+  Route,
+  RouterProvider,
+  Routes,
+} from "react-router-dom";
+
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 // import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
 import { getAuth } from "firebase/auth";
-import SplashScreen from "./pages/splashScreen";
+
+
+// Import auth components
 // import SignUp from './auth/SignUp';
 // import SignOut from './auth/SignOut';
 // import SignIn from './auth/SignIn';
 // import SendEmailVerification from "./auth/SendEmailVerification";
 // import GetUserProfile from "./auth/GetUserProfile";
+
+// Import pages
+import SplashScreen from "./pages/SplashScreen";
+import SignInPage from "./pages/authPages/SignInPage";
 
 
 export default function App() {
@@ -39,10 +50,23 @@ export default function App() {
   // const email = "joshuastoneage@gmail.com";
   // const password = "harmon13";
 
+  const router = createBrowserRouter(createRoutesFromElements(
+    <>
+      <Route 
+        path="/" 
+        element={<SplashScreen />} 
+      />
+      <Route 
+        path="/signin" 
+        element={<SignInPage />} 
+      />
+    </>
+  ));
+  
+
   return (
     <>
-      <SplashScreen />
-      
+      <RouterProvider router={router} />
     </>
   )
 }

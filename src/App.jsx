@@ -1,17 +1,18 @@
-// import { useState } from 'react';
+import { useEffect } from 'react';
 import { 
   createRoutesFromElements,
   createBrowserRouter,
   Route,
   RouterProvider,
-  redirect,
+  useNavigate,
+  redirect
 } from "react-router-dom";
 
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 // import { getAnalytics } from "firebase/analytics";
-import { getAuth } from "firebase/auth";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 
 // Import auth components
@@ -27,6 +28,7 @@ import SignUpPage, {
   // loader as signUpLoginLoader 
 } from "./pages/authPages/SignUpPage";
 import { requireAuth } from "./auth/requireAuth";
+import SignOut from "./auth/SignOut";
 
 // console.log(localStorage.clear());
 
@@ -53,6 +55,23 @@ export default function App() {
   // eslint-disable-next-line no-unused-vars, react-refresh/only-export-components
   const auth = getAuth(app);
 
+  // const navigate = useNavigate();
+
+  useEffect(() => {
+    const observer = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        console.log(user);
+        localStorage.setItem("loggedIn", true);
+        return redirect("/chats");
+      } else {
+        localStorage.removeItem("loggedIn");
+      }
+    });
+
+    return () => observer();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const router = createBrowserRouter(createRoutesFromElements(
     <>
       <Route 
@@ -76,12 +95,18 @@ export default function App() {
 
       <Route 
         path="/chats"
-        element={<h1>Chat component</h1>}
+        element={
+          <>
+            <h1>Chat component</h1>
+            {/* <SignOut />   */}
+          </>
+        }
         loader={async () => await requireAuth()}
       />
       
     </>
   ));
+  
   
 
   return (

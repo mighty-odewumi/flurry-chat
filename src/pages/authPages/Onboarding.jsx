@@ -16,7 +16,7 @@ export default function Onboarding({ errors, navigation, data }) {
           Login to Your Account
         </h1>
 
-        {(data || errors )&& <h3 className="mt-4 mb-4 text-xl text-red-800">{data}</h3>}
+        {(data) && <h3 className="mt-4 mb-4 text-xl text-red-800">{data}</h3>}
 
         <Form method="post" replace>
           <div className="relative mb-4">

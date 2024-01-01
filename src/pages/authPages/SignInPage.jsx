@@ -1,9 +1,10 @@
 /* eslint-disable react-refresh/only-export-components */
 import { useEffect } from "react";
 import { redirect, useActionData, useLoaderData, useNavigate, useNavigation } from "react-router-dom";
-import { authSignIn } from "../../auth/authSignIn";
+import { authSignIn, } from "../../auth/authSignIn";
 import Onboarding from "./Onboarding";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getAuth, onAuthStateChanged, } from "firebase/auth";
+import SignOut from "../../auth/SignOut";
 
 
 export async function loader({ request }) {
@@ -38,9 +39,21 @@ export async function action({ request }) {
   try {
     const data = await authSignIn(email, password);
     console.log(data);
-    
+    // localStorage.setItem("loggedIn", true);
+
+    // const auth = getAuth();
+
+    // onAuthStateChanged(auth, (user) => {
+    //   if (user) {
+    //     console.log(user);
+    //     localStorage.setItem("loggedIn", true);
+    //     return redirect("/chats");
+    //   } else {
+    //       localStorage.removeItem("loggedIn");
+    //   }
+    // });
     console.log(localStorage);
-    return redirect("/chats");
+    // redirect("/chats");
 
   } catch (err) {
       if (err?.errMsg?.includes("invalid-credential")) {
@@ -54,9 +67,12 @@ export async function action({ request }) {
       return errors;
   }
 
+  return null;
+
 }
 
 
+// SignInPage React component
 export default function SignInPage() {
 
   const errors = useActionData();
@@ -71,15 +87,15 @@ export default function SignInPage() {
       if (user) {
         console.log(user);
         localStorage.setItem("loggedIn", true);
-        return navigate("/chats");
+        return navigate("/chats", { replace: true });
       } else {
-        localStorage.removeItem("loggedIn");
+          localStorage.removeItem("loggedIn");
       }
     });
 
     return () => observer();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [navigate])
 
   return (
     <>

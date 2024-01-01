@@ -3,16 +3,19 @@ import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
 // Functional React component
 // eslint-disable-next-line react/prop-types, no-unused-vars
-export async function authSignIn(email, password) {
-  const auth = getAuth();
 
-  console.log(email, password)
+
+export async function authSignIn(email, password) {
+ 
+  const auth = getAuth();
+  // console.log(email, password)
 
   // Function that signs in a user
   // Imported from firebase package
   return signInWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
       const user = userCredential.user;
+      
       console.log("This user is signed in", user);
       return user;
     })
@@ -28,4 +31,5 @@ export async function authSignIn(email, password) {
       throw signInErrObject;
     });
 
+ 
 }

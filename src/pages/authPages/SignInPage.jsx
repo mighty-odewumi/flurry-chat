@@ -1,65 +1,93 @@
-import { Form, Link } from "react-router-dom";
-// import email from "./././assets/splash-assets/message-icon1.png";
-// import password from "./././assets/splash-assets/lock-icon1.png";
+/* eslint-disable react-refresh/only-export-components */
+import { useEffect } from "react";
+import { redirect, useActionData, useLoaderData, useNavigate, useNavigation } from "react-router-dom";
+import { authSignIn } from "../../auth/authSignIn";
+import Onboarding from "./Onboarding";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 
-export async function action() {
-  return null;
+export async function loader({ request }) {
+  const url = new URL(request.url).searchParams.get("message");
+  // console.log(url);
+  return url;
+}
+
+
+// eslint-disable-next-line react-refresh/only-export-components
+export async function action({ request }) {
+  // console.log(request);
+  const formData = await request.formData();
+  const email = formData.get("email");
+  const password = formData.get("password");
+  console.log(email, password);
+
+  const errors = {};
+
+  if (typeof email !== "string" || !email.includes("@")) {
+    errors.email = "That doesn't look like an email!";
+  }
+
+  if (typeof password !== "string" || password.length < 8) {
+    errors.password = "Password should not be less than 8 characters!";
+  }
+
+  if (Object.keys(errors).length) {
+    return errors;
+  }
+
+  try {
+    const data = await authSignIn(email, password);
+    console.log(data);
+    
+    console.log(localStorage);
+    return redirect("/chats");
+
+  } catch (err) {
+      if (err?.errMsg?.includes("invalid-credential")) {
+        errors.firebaseErr = "No user with those credentials found!";
+      }
+      
+      if (err?.errMsg) {
+        errors.firebaseErr = err?.errMsg;
+      }
+
+      return errors;
+  }
+
 }
 
 
 export default function SignInPage() {
 
+  const errors = useActionData();
+  const navigation = useNavigation();
+  const data = useLoaderData();
+  const navigate = useNavigate();
+
+  const auth = getAuth();
+
+  useEffect(() => {
+    const observer = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        console.log(user);
+        localStorage.setItem("loggedIn", true);
+        return navigate("/chats");
+      } else {
+        localStorage.removeItem("loggedIn");
+      }
+    });
+
+    return () => observer();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <>
-      <div className="font-inter p-4">
-        <h1 className="font-bold text-2xl mb-8">
-          Login to Your Account
-        </h1>
-
-        <Form method="post">
-          <div className="relative ">
-            <img src={email} alt="email icon" />
-            <input 
-              type="email" 
-              name="email" 
-              id="email" 
-              placeholder="Email"
-              className="bg-gray-100 w-full mb-4 py-2 px-4 rounded-md"
-
-            />
-          </div>
-          
-          <div className="relative ">
-            <img src={password} alt="password icon" />
-            <input 
-              type="password" 
-              name="password" 
-              id="password" 
-              placeholder="Password"
-              className="bg-gray-100 w-full mb-4 py-2 px-4 rounded-md"
-
-            />
-          </div>
-
-          <button 
-            className="rounded-md bg-blue-500 text-white py-2 px-4 w-full mb-4"
-          >
-            Sign in
-          </button>
-        </Form>
-
-        <p className="text-center">
-          Don&apos;t have an account?
-          <Link 
-            to="/signup"
-            className="text-bluegradient "
-          >
-            &nbsp;Sign up
-          </Link>
-        </p>
-      </div>
+      <Onboarding 
+        errors={errors}
+        navigation={navigation}
+        data={data}
+      />
     </>
   )
 }

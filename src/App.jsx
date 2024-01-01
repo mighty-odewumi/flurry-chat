@@ -4,6 +4,7 @@ import {
   createBrowserRouter,
   Route,
   RouterProvider,
+  redirect,
 } from "react-router-dom";
 
 
@@ -14,17 +15,20 @@ import { getAuth } from "firebase/auth";
 
 
 // Import auth components
-// import SignUp from './auth/SignUp';
-// import SignOut from './auth/SignOut';
-// import SignIn from './auth/SignIn';
 // import SendEmailVerification from "./auth/SendEmailVerification";
 // import GetUserProfile from "./auth/GetUserProfile";
 
 // Import pages
 import SplashScreen, { loader as splashLoader } from "./pages/SplashScreen";
-import SignInPage from "./pages/authPages/SignInPage";
-import AuthRequired from "./pages/authPages/AuthRequired";
+import SignInPage, { action as signInAction, loader as signInLoginLoader } from "./pages/authPages/SignInPage";
 
+import SignUpPage, { 
+  // action as signUpAction, 
+  // loader as signUpLoginLoader 
+} from "./pages/authPages/SignUpPage";
+import { requireAuth } from "./auth/requireAuth";
+
+// console.log(localStorage.clear());
 
 export default function App() {
 
@@ -35,7 +39,7 @@ export default function App() {
     authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
     projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
     storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: import.meta.VITE_FIREBASE_MESSAGING_SENDER_ID,
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
     appId: import.meta.env.VITE_FIREBASE_APP_ID,
     measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
   };
@@ -45,11 +49,9 @@ export default function App() {
   const app = initializeApp(firebaseConfig);
   // const analytics = getAnalytics(app);
 
-  // eslint-disable-next-line no-unused-vars
-  const auth = getAuth(app);
 
-  // const email = "joshuastoneage@gmail.com";
-  // const password = "harmon13";
+  // eslint-disable-next-line no-unused-vars, react-refresh/only-export-components
+  const auth = getAuth(app);
 
   const router = createBrowserRouter(createRoutesFromElements(
     <>
@@ -61,17 +63,22 @@ export default function App() {
       <Route 
         path="/signin" 
         element={<SignInPage />} 
-        
+        loader={signInLoginLoader}
+        action={signInAction}
       />
 
       <Route 
-        path=""
-        element={<AuthRequired />}
-      >
-        <Route 
-          path="/chats"
-        />
-      </Route>
+        path="/signup" 
+        element={<SignUpPage />} 
+        // loader={signUpLoginLoader}
+        // action={signUpAction}
+      />
+
+      <Route 
+        path="/chats"
+        element={<h1>Chat component</h1>}
+        loader={async () => await requireAuth()}
+      />
       
     </>
   ));

@@ -11,6 +11,7 @@ import {
 
 //  Functional React component
 export default function SignOut() {
+  
   const navigate = useNavigate();
 
   const auth = getAuth();

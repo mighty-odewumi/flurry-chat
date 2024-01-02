@@ -1,18 +1,15 @@
-import { useEffect } from 'react';
 import { 
   createRoutesFromElements,
   createBrowserRouter,
   Route,
   RouterProvider,
-  useNavigate,
-  redirect
 } from "react-router-dom";
 
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 // import { getAnalytics } from "firebase/analytics";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 
 
 // Import auth components
@@ -24,8 +21,8 @@ import SplashScreen, { loader as splashLoader } from "./pages/SplashScreen";
 import SignInPage, { action as signInAction, loader as signInLoginLoader } from "./pages/authPages/SignInPage";
 
 import SignUpPage, { 
-  // action as signUpAction, 
-  // loader as signUpLoginLoader 
+  action as signUpAction, 
+  loader as signUpLoginLoader 
 } from "./pages/authPages/SignUpPage";
 import { requireAuth } from "./auth/requireAuth";
 import SignOut from "./auth/SignOut";
@@ -46,31 +43,12 @@ export default function App() {
     measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
   };
 
-
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
   // const analytics = getAnalytics(app);
 
-
-  // eslint-disable-next-line no-unused-vars, react-refresh/only-export-components
   const auth = getAuth(app);
 
-  // const navigate = useNavigate();
-
-  useEffect(() => {
-    const observer = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        console.log(user);
-        localStorage.setItem("loggedIn", true);
-        return redirect("/chats");
-      } else {
-        localStorage.removeItem("loggedIn");
-      }
-    });
-
-    return () => observer();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   const router = createBrowserRouter(createRoutesFromElements(
     <>
@@ -89,8 +67,8 @@ export default function App() {
       <Route 
         path="/signup" 
         element={<SignUpPage />} 
-        // loader={signUpLoginLoader}
-        // action={signUpAction}
+        loader={signUpLoginLoader}
+        action={signUpAction}
       />
 
       <Route 
@@ -106,7 +84,6 @@ export default function App() {
       
     </>
   ));
-  
   
 
   return (

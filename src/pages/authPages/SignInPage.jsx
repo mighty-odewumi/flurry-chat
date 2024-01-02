@@ -1,26 +1,25 @@
 /* eslint-disable react-refresh/only-export-components */
 import { useEffect } from "react";
-import { redirect, useActionData, useLoaderData, useNavigate, useNavigation } from "react-router-dom";
+import { useActionData, useLoaderData, useNavigate, useNavigation } from "react-router-dom";
 import { authSignIn, } from "../../auth/authSignIn";
 import Onboarding from "./Onboarding";
 import { getAuth, onAuthStateChanged, } from "firebase/auth";
-import SignOut from "../../auth/SignOut";
 
 
 export async function loader({ request }) {
   const url = new URL(request.url).searchParams.get("message");
-  // console.log(url);
-  return url;
-}
+  const pathname = new URL(request.url).pathname;
 
+  console.log(pathname);
+  return [url, pathname];
+}
 
 // eslint-disable-next-line react-refresh/only-export-components
 export async function action({ request }) {
-  // console.log(request);
+  // console.log(request); 
   const formData = await request.formData();
   const email = formData.get("email");
   const password = formData.get("password");
-  console.log(email, password);
 
   const errors = {};
 
@@ -39,45 +38,35 @@ export async function action({ request }) {
   try {
     const data = await authSignIn(email, password);
     console.log(data);
-    // localStorage.setItem("loggedIn", true);
-
-    // const auth = getAuth();
-
-    // onAuthStateChanged(auth, (user) => {
-    //   if (user) {
-    //     console.log(user);
-    //     localStorage.setItem("loggedIn", true);
-    //     return redirect("/chats");
-    //   } else {
-    //       localStorage.removeItem("loggedIn");
-    //   }
-    // });
-    console.log(localStorage);
-    // redirect("/chats");
+    
+    // console.log(localStorage);
 
   } catch (err) {
-      if (err?.errMsg?.includes("invalid-credential")) {
-        errors.firebaseErr = "No user with those credentials found!";
+      errors.firebaseErr = "An unknown error occurred!", err;
+
+      if (err?.errorCode === "auth/network-request-failed") {
+        errors.firebaseErr = "You seem to be offline!";
       }
-      
-      if (err?.errMsg) {
-        errors.firebaseErr = err?.errMsg;
+
+      if (err?.errorCode === "auth/invalid-credential") {
+        errors.firebaseErr = "Invalid password or email supplied!";
       }
 
       return errors;
   }
 
   return null;
-
 }
 
 
 // SignInPage React component
 export default function SignInPage() {
-
   const errors = useActionData();
   const navigation = useNavigation();
   const data = useLoaderData();
+  const queryString = data[0];
+  const pathname = data[1];
+
   const navigate = useNavigate();
 
   const auth = getAuth();
@@ -102,7 +91,8 @@ export default function SignInPage() {
       <Onboarding 
         errors={errors}
         navigation={navigation}
-        data={data}
+        queryString={queryString}
+        pathname={pathname}
       />
     </>
   )

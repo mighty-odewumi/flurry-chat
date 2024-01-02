@@ -5,7 +5,8 @@ import password from "../../assets/splash-assets/lock-icon1.png";
 import FlurryLogo from "../FlurryLogo";
 
 
-export default function Onboarding({ errors, navigation, data }) {
+export default function Onboarding({ errors, navigation, queryString, pathname }) {
+
   return (
     <>
       <div className="font-inter p-6 md:w-96 md:m-auto">
@@ -13,10 +14,18 @@ export default function Onboarding({ errors, navigation, data }) {
         <FlurryLogo />
 
         <h1 className="font-bold text-2xl mb-8 mt-10">
-          Login to Your Account
+          {
+            pathname === "/signin" 
+              ? "Login to Your Account"
+              : "Create an Account"
+          }
         </h1>
 
-        {(data) && <h3 className="mt-4 mb-4 text-xl text-red-800">{data}</h3>}
+        {(queryString) 
+          && <h3 className="mt-4 mb-4 text-xl text-red-800">
+            {queryString}
+          </h3>
+        }
 
         <Form method="post" replace>
           <div className="relative mb-4">
@@ -33,10 +42,9 @@ export default function Onboarding({ errors, navigation, data }) {
               className="bg-gray-100 w-full  py-2 px-9 rounded-md"
             />
 
-            {// eslint-disable-next-line react/prop-types
-            errors?.email 
-              // eslint-disable-next-line react/prop-types
-              && <span className="text-sm ">{errors.email}</span>
+            {
+              errors?.email 
+                && <span className="text-sm ">{errors.email}</span>
             }
           </div>
           
@@ -54,9 +62,7 @@ export default function Onboarding({ errors, navigation, data }) {
               className="bg-gray-100 w-full py-2 px-9 rounded-md"
             />
             {
-              // eslint-disable-next-line react/prop-types
               errors?.password 
-                // eslint-disable-next-line react/prop-types
                 && <span className="text-sm ">{errors.password}</span>
             }
           </div>
@@ -65,12 +71,17 @@ export default function Onboarding({ errors, navigation, data }) {
             className="rounded-md bg-blue-500 text-white py-2 px-4 w-full mb-4 hover:bg-bluegradient transition-all"
             disabled={navigation.state === "submitting"}
           >
-            {
-              // eslint-disable-next-line react/prop-types
-              navigation.state === "submitting" 
-                ? "Signing in..."
-                : "Sign in"
+            {pathname === "/signin" 
+              ? (navigation.state === "submitting" 
+                  ? "Signing in..."
+                  : "Sign in"
+                )
+              : (navigation.state === "submitting"
+                  ? "Signing up..."
+                  : "Sign up"
+                )
             }
+          
           </button>
 
           {
@@ -80,16 +91,37 @@ export default function Onboarding({ errors, navigation, data }) {
         </Form>
 
         <p className="text-center">
-          Don&apos;t have an account?
-          <Link 
-            to="/signup"
-            className="text-bluegradient "
-          >
-            &nbsp;Sign up
-          </Link>
+          {
+            pathname === "/signin" 
+              ? (
+                  <>
+                    <span>
+                      Don&apos;t have an account?
+                    </span>  
+                    
+                    <Link 
+                      to="/signup"
+                      className="text-bluegradient "
+                    >
+                      &nbsp;Sign up
+                    </Link>  
+                  </>
+                )
+
+              : (
+                  <>
+                    <span>Already have an account?</span> 
+                    <Link 
+                    to="/signin"
+                    className="text-bluegradient "
+                  >
+                    &nbsp;Sign in
+                    </Link>
+                  </>
+                )
+          }
         </p>
       </div>
     </>
   )
 }
-

@@ -1,35 +1,61 @@
-import { Link } from "react-router-dom";
+import { useLoaderData, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
 import chatLogo from "../assets/splash-assets/chat-logo18.png";
-import splash from "../assets/splash-assets/splash1.jpg";
+import { useEffect } from "react";
+// import splash from "../assets/splash-assets/splash1.jpg";
 
+
+// eslint-disable-next-line react-refresh/only-export-components
+export async function loader() {
+  return null;
+}
 
 export default function SplashScreen() {
 
+  const navigate = useNavigate();
 
+  const data = useLoaderData();
+  console.log(data);
+
+  useEffect(() => {
+    
+    const timerID = setTimeout(() => {
+      navigate("/chats");
+    }, 4000);
+  
+    return () => clearTimeout(timerID);
+  }, [navigate])
+  
+  
   return (
     <>
-      <motion.div 
+      <div 
         className="bg-bluegradient flex flex-col gap-1 justify-center items-center h-screen"
-        initial={{ transform: "translateX(100px)" }}
-        animate={{ transform: "translateX(0px)" }}
-        transition={{ type: "tween", stiffness: 50, delay: .25, ease: "easeIn", }}
       >
-        <motion.div 
-          animate={{ rotate: 360 }}
-          transition={{ repeat: Infinity, repeatDelay: 1, duration: 2, ease: "easeIn" }}
+        <motion.div
+          initial={{ opacity: 0, transform: "translateY(100px)" }}
+          animate={{ opacity: 1, transform: "translateY(0px)" }}
+          transition={{ type: "spring", stiffness: 50, ease: "easeOut", }}
+          className="flex flex-row justify-center items-center gap-2"
         >
-          <img 
-            src={chatLogo} 
-            alt="someone using a phone" 
-            className="w-16 "
-           
-          />  
+          <motion.div 
+            animate={{ rotate: 360 }}
+            transition={{ repeat: Infinity, repeatDelay: 1, duration: 2, ease: "easeIn" }}
+          >
+            <img 
+              src={chatLogo} 
+              alt="chat" 
+              className="w-12 "
+            />  
+          </motion.div>
+
+          <h1 className="text-3xl font-inter font-bold text-white tracking-widest mt-0">
+            flurry
+          </h1> 
         </motion.div>
-       
-         <h1 className="text-3xl font-inter font-bold text-white tracking-widest mt-0">flurry</h1>  
-      </motion.div>
+      </div>
+
 
       {/* <div className="flex flex-col gap-4 justify-center items-center h-screen p-4 font-inter text-center">
         <img 

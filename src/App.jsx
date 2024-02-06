@@ -5,11 +5,16 @@ import {
   RouterProvider,
 } from "react-router-dom";
 
-
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-// import { getAnalytics } from "firebase/analytics";
-import { getAuth } from "firebase/auth";
+import { getMessaging } from "firebase/messaging";
+import { getAuth, connectAuthEmulator } from "firebase/auth";
+import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
+
+// Firebase Config
+import { firebaseConfig } from "./config";
+
+// import {  requestPopup } from "./utils/messaging_get_token";
 
 
 // Import auth components
@@ -17,31 +22,31 @@ import { getAuth } from "firebase/auth";
 // import GetUserProfile from "./auth/GetUserProfile";
 
 // Import pages
-import SplashScreen, { loader as splashLoader } from "./pages/SplashScreen";
-import SignInPage, { action as signInAction, loader as signInLoginLoader } from "./pages/authPages/SignInPage";
+import SplashScreen, { 
+  loader as splashLoader 
+} from "./pages/SplashScreen";
+
+import SignInPage, { 
+  action as signInAction, 
+  loader as signInLoginLoader 
+} from "./pages/authPages/SignInPage";
 
 import SignUpPage, { 
   action as signUpAction, 
   loader as signUpLoginLoader 
 } from "./pages/authPages/SignUpPage";
+
 import { requireAuth } from "./auth/requireAuth";
 import SignOut from "./auth/SignOut";
+import DirectChat, { action as chatAction } from "./pages/mainUI/chat/DirectChat";
+// import { saveMessagingDeviceToken } from "./firebase/messaging";
+// import { getAccessToken } from "./utils/getAccessToken";
+// import { notificationCall } from "./utils/notificationCall";
 
 // console.log(localStorage.clear());
 
-export default function App() {
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-    appId: import.meta.env.VITE_FIREBASE_APP_ID,
-    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
-  };
+export default function App() {
 
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
@@ -49,6 +54,20 @@ export default function App() {
 
   const auth = getAuth(app);
 
+  const messaging = getMessaging(app);
+
+  const db = getFirestore();
+
+  // saveMessagingDeviceToken();
+
+  // admin.initializeApp({
+  //   credential: admin.credential.applicationDefault(),
+  // });
+
+  if (location.hostname === "localhost") {
+    connectAuthEmulator(auth, "http://localhost:9099");
+    connectFirestoreEmulator(db, "localhost", "5180");
+  }
 
   const router = createBrowserRouter(createRoutesFromElements(
     <>
@@ -76,9 +95,12 @@ export default function App() {
         element={
           <>
             <h1>Chat component</h1>
+            <DirectChat />
+
             {/* <SignOut />   */}
           </>
         }
+        action={chatAction}
         loader={async () => await requireAuth()}
       />
       

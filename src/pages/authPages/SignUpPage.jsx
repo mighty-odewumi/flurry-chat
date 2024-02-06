@@ -69,6 +69,7 @@ export default function SignUpPage() {
   const navigation = useNavigation();
   const navigate = useNavigate();
   
+  
 
   useEffect(() => {
     const observer = onAuthStateChanged(auth, (user) => {

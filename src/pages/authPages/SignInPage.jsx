@@ -9,14 +9,11 @@ import { getAuth, onAuthStateChanged, } from "firebase/auth";
 export async function loader({ request }) {
   const url = new URL(request.url).searchParams.get("message");
   const pathname = new URL(request.url).pathname;
-
-  console.log(pathname);
   return [url, pathname];
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
 export async function action({ request }) {
-  // console.log(request); 
   const formData = await request.formData();
   const email = formData.get("email");
   const password = formData.get("password");
@@ -38,9 +35,6 @@ export async function action({ request }) {
   try {
     const data = await authSignIn(email, password);
     console.log(data);
-    
-    // console.log(localStorage);
-
   } catch (err) {
       errors.firebaseErr = "An unknown error occurred!", err;
 

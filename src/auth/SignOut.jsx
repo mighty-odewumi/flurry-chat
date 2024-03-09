@@ -32,7 +32,7 @@ export default function SignOut() {
       if (user) {
         console.log(user);
         localStorage.setItem("loggedIn", true);
-        return navigate("/chats", { replace: true });
+        return navigate("/chatlist", { replace: true });
       } else {
           localStorage.removeItem("loggedIn");
           return navigate("/signin?error=(From SignOut) - You need to be signed in!!!");
@@ -41,7 +41,7 @@ export default function SignOut() {
 
     return () => observer();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []) 
+  }) 
 
   return (
     <>

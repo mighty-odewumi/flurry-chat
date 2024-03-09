@@ -1,93 +1,118 @@
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { addDoc, collection, getFirestore, onSnapshot } from "firebase/firestore";
-import { useEffect, useState } from "react";
-import { Form } from "react-router-dom";
+import { addDoc, collection, getFirestore, serverTimestamp } from "firebase/firestore";
+// import { useEffect, useState } from "react";
+import { useFetcher, useActionData } from "react-router-dom";
+import { v4 as uuidv4 } from "uuid";
+import MessageList from "./MessageList";
 
-// eslint-disable-next-line react-refresh/only-export-components
-export async function action({request}) {
-  const formData = await request.formData();
-  const message = formData.get("message");
-  console.log("Message from action function", message);
-
-  // Save message to Firestore after obtaining input from the user.
+// Create conversation
+async function createConversation(senderId, recipientId) {
   try {
     const db = getFirestore();
-    const messageRef = collection(db, "messages");
-    await addDoc(messageRef, {
-      text: message,
-      timeStamp: new Date(),
+    const conversationsRef = collection(db, "conversations");
+    await addDoc(conversationsRef, {
+      senderId,
+      recipientId,
+      lastTimestamp: serverTimestamp(),
     });
-    console.log("Message saved to Firestore successfully!");
-    return { success: true };
   } catch (error) {
-    console.log("An error occurred while saving message", error);
-    return { success: false, error: error.message };
+    console.log("Unable to create conversation", error);
   }
 }
 
-export default function DirectChat() {
+// Sends message
+async function sendMessage(senderId, recipientId, text) {
+  try {
+    const db = getFirestore();
+    await createConversation(senderId, recipientId);
+    const eachMessageId = generateMessageId();
+    const conversationId = generateConversationId(senderId, recipientId);
+    const messageRef = collection(db, `conversations/${conversationId}/messages`);
+    
+    // Add message to conversation
+    await addDoc(messageRef, {
+      eachMessageId,
+      text,
+      timestamp: serverTimestamp()
+    }); 
 
-  const [messages, setMessages] = useState([]);
-  const db = getFirestore();
-  const auth = getAuth();
-
-  // Retrieves data from Firestore
-  async function syncData() {
-    try {
-      const messagesRef = collection(db, "messages");
-      console.log(messagesRef);
-      onSnapshot(messagesRef, snapshot => {
-        const messageData = [];
-        // const messages = snapshot.docs.map(doc => doc.data());
-        snapshot.forEach((doc) => {
-          messageData.push({ id: doc.id, ...doc.data() });
-        });
-        console.log("Messages from Firestore", messageData);
-        setMessages(messageData);
-      });
-    } catch (error) {
-      console.log("Error fetching messages", error);
-    }
+    console.log("Message sent successfully");
+  } catch (error) {
+      console.log("Error occurred while sending message!", error);
+      throw error;
   }
+}
 
-  useEffect(() => {
-    const observer = onAuthStateChanged(auth, user => {
-      if (user) {      
-        syncData();
-      }
-    });
-    return () => observer();
-  }, []);
+// Generates the conversation ID from user IDs
+// eslint-disable-next-line react-refresh/only-export-components
+export function generateConversationId(senderId, recipientId) {
+  return [senderId, recipientId].sort().join("_");
+}
 
-  const fireMsg = messages.map((msg) => (
-    <>
-      <ul 
-        className=""
-        key={msg.id}
-      >
-        <li className="">{msg.text}</li>
-      </ul>
-    </>
-  ));
+// Generates the message ID randomly
+// eslint-disable-next-line react-refresh/only-export-components
+export function generateMessageId() {
+  return uuidv4();
+}
+
+// eslint-disable-next-line react-refresh/only-export-components
+export async function action({ request }) {
+  const formData = await request.formData();
+  const message = formData.get("message");
+  const searchParams = location.search;
+  const queryParams = new URLSearchParams(searchParams);
+  const senderId = queryParams.get("senderId");
+  const recipientId = queryParams.get("recipientId");
+  await sendMessage(senderId, recipientId, message);
+  return (senderId, recipientId);  
+}
+
+// eslint-disable-next-line react/prop-types
+export default function DirectChat({ userId }) {
+
+  const fetcher = useFetcher();
+  const status = fetcher.formData?.get("message");
+
+  const isComplete = fetcher.state === "submitting";
+  const actionData = useActionData();
+  console.log("Action data", actionData);
+
+  const searchParams = location.search;
+  const queryParams = new URLSearchParams(searchParams);
+  const recipientId = queryParams.get("recipientId");
 
   return (
     <>
-      <h1>Messages on cloud!</h1>
-      {fireMsg}
+      
+      <br />
+      <MessageList 
+        conversationId={"hello"}
+        senderId={userId}
+        recipientId={recipientId}
+      />
       <br />
 
-      <Form method="post">
+      <fetcher.Form method="post">
         <input 
           type="text" 
           name="message" 
           id="message" 
+          placeholder="Enter your message"
+          value={ isComplete ? "" : status }
           className="ring-2"
         />
 
         <button>
           Send Message
         </button>
-      </Form>
+      </fetcher.Form>
     </>
-  )
+  );
 }
+
+
+/* 
+* Create a conversation using the senderId and the recipientId
+* Generate a conversationId using the senderId and the recipientId collected from URL parameter
+* Send the message to recipient and add it under the conversation collection
+* 
+*/

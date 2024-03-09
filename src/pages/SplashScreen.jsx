@@ -1,4 +1,4 @@
-import { useLoaderData, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
 import chatLogo from "../assets/splash-assets/chat-logo18.png";
@@ -15,13 +15,10 @@ export default function SplashScreen() {
 
   const navigate = useNavigate();
 
-  const data = useLoaderData();
-  console.log(data);
-
   useEffect(() => {
     
     const timerID = setTimeout(() => {
-      navigate("/chats");
+      navigate("/conversations");
     }, 4000);
   
     return () => clearTimeout(timerID);

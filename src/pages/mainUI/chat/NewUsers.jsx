@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useState, useEffect } from "react";
-import { getFirestore, query, collection, where, onSnapshot } from "firebase/firestore";
+import { getFirestore, collection, onSnapshot } from "firebase/firestore";
 import { Link } from "react-router-dom";
 
 export default function NewUsers({ userId }) {
@@ -13,7 +13,6 @@ export default function NewUsers({ userId }) {
       try {
         const db = getFirestore();
         const newUsersRef = collection(db, "users");
-        // const newUsersQuery = query(newUsersRef, where("users", "array-contains", userId));
 
         const unsubscribe = onSnapshot(newUsersRef, (snapshot) => {
           const users = snapshot.docs.map(doc => ({
@@ -39,7 +38,7 @@ export default function NewUsers({ userId }) {
       <ul>
         {newUsers.map((appUser) => (
           <li key={appUser.id}>
-            <Link to={`/chat/${appUser.id}?senderId=${userId}&recipientId=${appUser.uid}`}>--{appUser.name}</Link>
+            <Link to={`/chat?senderId=${userId}&recipientId=${appUser.uid}`}>--{appUser.name}</Link>
           </li>
         ))}
       </ul>

@@ -126,7 +126,7 @@ export default function App() {
       />
 
       <Route 
-        path={`/chat/:conversationId`}
+        path={`/chat`}
         element={
           <>
             <h1>Chat component</h1>

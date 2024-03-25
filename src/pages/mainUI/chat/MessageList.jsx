@@ -4,10 +4,11 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { generateConversationId } from "./DirectChat";
 import { getFirestore, query, orderBy, onSnapshot, collection } from "firebase/firestore";
 
-export default function MessageList({ conversationId, senderId, recipientId, }) {
+export default function MessageList({ senderId, recipientId, }) {
 
   const [messages, setMessages] = useState([]);
   const auth = getAuth();
+  const conversationId = generateConversationId(senderId, recipientId);
 
   useEffect(() => {
     // eslint-disable-next-line no-unused-vars
@@ -16,7 +17,6 @@ export default function MessageList({ conversationId, senderId, recipientId, }) 
       async function fetchMessages() {
         try {
           const db = getFirestore();
-          const conversationId = generateConversationId(senderId, recipientId);
           const conversationRef = collection(db, `conversations/${conversationId}/messages`);
           const messagesQuery = query(conversationRef, orderBy("timestamp"));
 
@@ -42,7 +42,7 @@ export default function MessageList({ conversationId, senderId, recipientId, }) 
     });
     return () => observer();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [senderId, recipientId]);
+  }, [conversationId, senderId, recipientId]);
 
   const fireMsg = messages.map((msg) => (
     <ul 

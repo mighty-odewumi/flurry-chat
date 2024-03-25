@@ -12,6 +12,7 @@ async function createConversation(senderId, recipientId) {
     await addDoc(conversationsRef, {
       senderId,
       recipientId,
+      participants: [senderId, recipientId],
       lastTimestamp: serverTimestamp(),
     });
   } catch (error) {
@@ -108,11 +109,3 @@ export default function DirectChat({ userId }) {
     </>
   );
 }
-
-
-/* 
-* Create a conversation using the senderId and the recipientId
-* Generate a conversationId using the senderId and the recipientId collected from URL parameter
-* Send the message to recipient and add it under the conversation collection
-* 
-*/

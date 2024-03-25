@@ -32,7 +32,7 @@ export default function SignOut() {
       if (user) {
         console.log(user);
         localStorage.setItem("loggedIn", true);
-        return navigate("/chatlist", { replace: true });
+        return navigate("/conversations", { replace: true });
       } else {
           localStorage.removeItem("loggedIn");
           return navigate("/signin?error=(From SignOut) - You need to be signed in!!!");

@@ -70,7 +70,7 @@ export default function SignInPage() {
       if (user) {
         console.log(user);
         localStorage.setItem("loggedIn", true);
-        return navigate("/chats", { replace: true });
+        return navigate("/conversations", { replace: true });
       } else {
           localStorage.removeItem("loggedIn");
       }

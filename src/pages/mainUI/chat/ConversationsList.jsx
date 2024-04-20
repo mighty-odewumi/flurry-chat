@@ -1,8 +1,11 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
 import { collection, query, where, getFirestore, getDocs, } from "firebase/firestore";
-import { Link } from "react-router-dom";
+import { Form, Link } from "react-router-dom";
 import NewUsers from "./NewUsers";
+import profile from "../../../assets/flurry-assets/profile.png";
+import search from "../../../assets/flurry-assets/search.png";
+
 
 export default function ConversationsList({ userId }) {
   const [previousConversations, setPreviousConversations] = useState([]);
@@ -12,7 +15,7 @@ export default function ConversationsList({ userId }) {
       const db = getFirestore();
       const usersRef = collection(db, "users");
 
-       // Create a query to find documents where the userId field is in the userIds array
+      // Create a query to find documents where the uid field is in the userIds array
       const querySnapshot = await getDocs(query(usersRef, where("uid", "in", userIds)));
 
       // Extract user data from query results
@@ -33,6 +36,7 @@ export default function ConversationsList({ userId }) {
         where("participants", "array-contains", userId)
       ));
       const prevConvoUsers = [];
+      
       conversationsQuery.forEach(doc => {
         const data = doc.data();
         console.log(data);
@@ -59,19 +63,69 @@ export default function ConversationsList({ userId }) {
 
     fetchPrevUsers();
     
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]); 
 
   return (
-    <div>
+    <div className="m-4">
+      <div className="flex justify-between items-center">
+        <h1 className="font-bold font-inter text-[24px]">flurry</h1>
+        <Link><img src={profile} alt="user profile" /></Link>
+      </div>
+
+      <Form method="get" className="p-1 mt-2 mb-4 border-gray-500 border rounded-full flex items-center ">
+        <button className="mr-2 ml-2">
+          <img 
+            src={search} 
+            alt="search icon" 
+          />
+        </button>
+        <input 
+          type="text"
+          placeholder="Search here..."
+          className="focus:outline-0"
+        />
+      </Form>
+
       <NewUsers 
         userId={userId}
       />
-      <h2>Previous Chats</h2>
-      <ul>
+
+      <h2 className="my-4 font-bold font-inter text-sm">Previous Chats</h2>
+      <ul className="max-w-lg mx-auto ">
         {previousConversations?.map((conversation, index) => (
-          <li key={index}>
-            <Link to={`/chat?senderId=${userId}&recipientId=${conversation.uid}`}>--Convo #{index} {conversation.name}</Link>
-          </li>
+          <Link 
+            to={`/chat?senderId=${userId}&recipientId=${conversation.uid}`}
+            className="flex items-center justify-between mb-4 hover:bg-gray-100 transition-all p-2"
+            key={index}
+          >
+            {/* <div className=""> */}
+              <div className="flex-shrink-0 mr-4">
+                <img 
+                  src={conversation.avatar} 
+                  alt="user avatar" 
+                  className="ring-2 rounded-full w-12 h-12"
+                />
+              </div>
+               
+              {/* <div className="ring-2 rounded-[100%] text-center fl ex justify-cent er font-bold ">{userImg}</div> */}
+              <div className="flex-1">
+                <div className="flex items-center justify-between ">
+                  <div className="font-semibold text-lg">{conversation.name}</div>
+                  
+                  <div className="text-gray-500 text-sm">20 April</div>
+                </div>
+                
+                <div className="flex justify-between items-center">
+                  <p className="text-gray-600 text-sm mt-1">My message</p>
+                  <div className="flex items-center">
+                    <span className="text-white rounded-full bg-secondaryblue px-2 py-1 text-xs bg-opacity-100">2</span>
+                  </div>
+                </div>
+              </div>
+            {/* </div> */}
+          </Link>
+          
         ))}
       </ul>
     </div>

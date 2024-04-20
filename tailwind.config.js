@@ -9,6 +9,7 @@ export default {
       colors: {
         primaryblue: "#4a86b7",
         bluegradient: "#2448b1",
+        secondaryblue: "#494dd3",
       },
       fontFamily: {
         inter: ["Inter", "sans-serif"],

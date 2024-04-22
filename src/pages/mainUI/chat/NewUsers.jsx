@@ -35,8 +35,11 @@ export default function NewUsers({ userId }) {
   return (
     <div>
       <h2 className="font-bold font-inter text-sm mb-3">New Users</h2>
-      <ul className="flex overflow-x-scroll gap-4">
+      <ul className="flex overflow-x-scroll gap-1">
         {newUsers.map((appUser) => {
+
+          // Using Users' names to form the image for now.
+          // Image uploads will be part of a future update.
           const username = appUser.name;
           const nameArray = username.split("");
           const userImg = (nameArray[0] + nameArray[1]).toUpperCase();
@@ -48,13 +51,21 @@ export default function NewUsers({ userId }) {
                
               >
                 <div className="flex flex-col items-center ">
-                  <img 
+                  {/* <img 
                     src={appUser.avatar} 
                     alt="user avatar" 
                     className="ring-2 rounded-full w-12 h-12"
-                  />
-                  {/* <div className="ring-2 rounded-[100%] text-center fl ex justify-cent er font-bold ">{userImg}</div> */}
-                  <span className="mt-2">{appUser.name}</span>
+                  /> */}
+                  {/* <div className="ring-2 rounded-[100%] text-center fl ex justify-cent er font-bold w-8 h-8">{userImg}
+                  </div> */}
+                  <div className="flex items-center">
+                    <span className="ring-2 ring-secondaryblue rounded-full px-3 py-2 text-2xl font-bold "
+                    >
+                      {userImg}
+                    </span>
+                  </div>
+                    
+                  <span className="mt-2 font-semibold text-sm">{appUser.name}</span>
                 </div>
               </Link>
             </li>

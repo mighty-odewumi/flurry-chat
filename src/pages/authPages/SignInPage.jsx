@@ -7,7 +7,7 @@ import { getAuth, onAuthStateChanged, } from "firebase/auth";
 
 
 export async function loader({ request }) {
-  const url = new URL(request.url).searchParams.get("message");
+  const url = new URL(request.url)?.searchParams?.get("message");
   const pathname = new URL(request.url).pathname;
   return [url, pathname];
 }

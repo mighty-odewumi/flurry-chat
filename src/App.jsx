@@ -40,6 +40,7 @@ import { requireAuth } from "./auth/requireAuth";
 import SignOut from "./auth/SignOut";
 import DirectChat, { action as chatAction } from "./pages/mainUI/chat/DirectChat";
 import ConversationsList from "./pages/mainUI/chat/ConversationsList";
+import Convos from "./pages/mainUI/chat/Convos";
 // import { saveMessagingDeviceToken } from "./firebase/messaging";
 // import { getAccessToken } from "./utils/getAccessToken";
 // import { notificationCall } from "./utils/notificationCall";
@@ -82,7 +83,7 @@ export default function App() {
     });
 
     if (location.hostname === "localhost") {
-      connectAuthEmulator(auth, "http://localhost:9099");
+      connectAuthEmulator(auth, "http://localhost:5150");
       connectFirestoreEmulator(db, "localhost", "5180");
     }
 
@@ -129,7 +130,6 @@ export default function App() {
         path={`/chat`}
         element={
           <>
-            <h1>Chat component</h1>
             <DirectChat 
               userId={userId}
             />

@@ -1,8 +1,12 @@
 import { addDoc, collection, getFirestore, serverTimestamp } from "firebase/firestore";
 // import { useEffect, useState } from "react";
-import { useFetcher, useActionData } from "react-router-dom";
+import { useFetcher, useActionData, Link } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import MessageList from "./MessageList";
+import send from "../../../assets/flurry-assets/sendIcon2.png";
+import back from "../../../assets/flurry-assets/back.png";
+import profile from "../../../assets/flurry-assets/profile.png";
+
 
 // Create conversation
 async function createConversation(senderId, recipientId) {
@@ -33,7 +37,9 @@ async function sendMessage(senderId, recipientId, text) {
     await addDoc(messageRef, {
       eachMessageId,
       text,
-      timestamp: serverTimestamp()
+      timestamp: serverTimestamp(),
+      senderId,
+      readBy: [senderId], // Initialize readBy with senderId
     }); 
 
     console.log("Message sent successfully");
@@ -80,32 +86,59 @@ export default function DirectChat({ userId }) {
   const searchParams = location.search;
   const queryParams = new URLSearchParams(searchParams);
   const recipientId = queryParams.get("recipientId");
+  const recipientName = queryParams.get("recipientName");
 
   return (
-    <>
+    <div className="mb-12">
+
+      <div className="flex items-center justify-between m-4">
+        <Link to="/conversations">
+          <img 
+            src={back} 
+            alt="back button" 
+          />
+        </Link>
+
+        <div className="flex items-center ">
+          <div className="flex-shrink-0 mr-3">
+            <img 
+              src={profile} 
+              alt="user avatar" 
+              className="ring-2 rounded-full w-10 h-10 p-2"
+            />
+          </div>
+
+          <p className="font-in ter font-black">{recipientName}</p>
+        </div>
+        
+        <div className=""></div>
+      </div>
       
-      <br />
+      <div className="border-b-2"></div>
+      {/* <br /> */}
       <MessageList 
-        conversationId={"hello"}
         senderId={userId}
         recipientId={recipientId}
       />
-      <br />
 
-      <fetcher.Form method="post">
+      <fetcher.Form method="post" className="flex items-center rounded-full bg-slate-100 p-5 py-3 mt-5 bottom-0 inset-x-0 fixed z-[100000] w-full ">
         <input 
           type="text" 
           name="message" 
           id="message" 
-          placeholder="Enter your message"
+          placeholder="Type your message here..."
           value={ isComplete ? "" : status }
-          className="ring-2"
+          className="bg-transparent outline-0 mr-auto w-full "
         />
 
         <button>
-          Send Message
+          <img 
+            src={send} 
+            alt="" 
+            className="h-6 mx-3 hover:h-7 transition-all " 
+          />
         </button>
       </fetcher.Form>
-    </>
+    </div>
   );
 }

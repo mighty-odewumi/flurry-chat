@@ -104,7 +104,7 @@ export default function MessageList({ senderId, recipientId, }) {
     
     <li className={`${msg.senderId === senderId 
       ? "bg-secondaryblue rounded-l-full rounded-tr-full text-white float-right clear-both w-fit" 
-      : "bg-gray-400 rounded-r-full rounded-tl-full mr-10 float-left clear-both w-fit"
+      : "bg-primarygray rounded-r-full rounded-tl-full mr-10 float-left clear-both w-fit"
       } my-2 px-6 py-2 `}
       key={msg.id}
     >
@@ -113,7 +113,7 @@ export default function MessageList({ senderId, recipientId, }) {
   ));
 
   return (
-    <div className="flex-1 overflow-y-auto p-2 " ref={messagesEndRef} >
+    <div className="flex-1 overflow-y-auto p-2 px-3 m x-3" ref={messagesEndRef} >
       <ul className="la st:mb-10" >
         {fireMsg}
         

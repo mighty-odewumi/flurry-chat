@@ -69,7 +69,7 @@ export async function action({ request }) {
   const queryParams = new URLSearchParams(searchParams);
   const senderId = queryParams.get("senderId");
   const recipientId = queryParams.get("recipientId");
-  await sendMessage(senderId, recipientId, message);
+  message && await sendMessage(senderId, recipientId, message);
   return (senderId, recipientId);  
 }
 
@@ -101,6 +101,7 @@ export default function DirectChat({ userId }) {
       messagesEndRef.current.focus(); // Set the bottom of the messages list to the position to be viewed infinitely unless scrolled up.
     }
   }, [])
+
 
   return (
     <div className="flex h-screen flex-col">
@@ -139,7 +140,7 @@ export default function DirectChat({ userId }) {
         messagesEndRef={messagesEndRef}
       />
 
-      <fetcher.Form method="post" className="flex items-center rounded-full bg-slate-100 p-5 py-3 mt-5 bottom-0 inset-x-0 sticky z-[100000] w-full shadow-md">
+      <fetcher.Form method="post" className="flex items-center rounded-full bg-primarygray p-5 py-3 mt-5 bottom-0 inset-x-0 sticky z-[100000] w-full shadow-md">
         <input 
           type="text" 
           name="message" 
@@ -149,14 +150,15 @@ export default function DirectChat({ userId }) {
           className="bg-transparent outline-0 mr-auto w-full "
         />
 
-        <button>
+        <button >
           <img 
             src={send} 
-            alt="" 
-            className="h-6 mx-3 hover:h-7 transition-all " 
+            alt="Send button" 
+            className="h-6 mx-3 hover:h-7 hover:cursor-pointer transition-all " 
           />
         </button>
       </fetcher.Form>
     </div>
   );
 }
+

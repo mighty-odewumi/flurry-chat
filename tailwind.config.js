@@ -10,7 +10,8 @@ export default {
         primaryblue: "#4a86b7",
         bluegradient: "#2448b1",
         secondaryblue: "#494dd3",
-        primarygray: "#e5e7eb4d",
+        primarygray: "#eaf4f4", 
+        // primarygray: "gray-50",
       },
       fontFamily: {
         inter: ["Inter", "sans-serif"],

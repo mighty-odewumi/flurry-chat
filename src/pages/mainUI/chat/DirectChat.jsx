@@ -1,5 +1,5 @@
 import { addDoc, collection, getFirestore, serverTimestamp } from "firebase/firestore";
-// import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, } from "react";
 import { useFetcher, useActionData, Link } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import MessageList from "./MessageList";
@@ -79,6 +79,8 @@ export default function DirectChat({ userId }) {
   const fetcher = useFetcher();
   const status = fetcher.formData?.get("message");
 
+  const messagesEndRef = useRef(null); // Set a ref to update the UI to the bottom of the chat list.
+
   const isComplete = fetcher.state === "submitting";
   const actionData = useActionData();
   console.log("Action data", actionData);
@@ -88,8 +90,20 @@ export default function DirectChat({ userId }) {
   const recipientId = queryParams.get("recipientId");
   const recipientName = queryParams.get("recipientName");
 
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      // if (fetcher.state === "submitting") {
+      //   const lastMessageElement = messagesEndRef.current.lastChild;
+      //   lastMesssageElement.scrollIntoView();
+      // } else {
+      //   messagesEndRef.current.scrollTop = messagesEndRef.current.scrollHeight;
+      // }
+      messagesEndRef.current.focus(); // Set the bottom of the messages list to the position to be viewed infinitely unless scrolled up.
+    }
+  }, [])
+
   return (
-    <div className="mb-12">
+    <div className="flex h-screen flex-col">
 
       <div className="flex items-center justify-between m-4">
         <Link to="/conversations">
@@ -100,15 +114,18 @@ export default function DirectChat({ userId }) {
         </Link>
 
         <div className="flex items-center ">
-          <div className="flex-shrink-0 mr-3">
-            <img 
-              src={profile} 
-              alt="user avatar" 
-              className="ring-2 rounded-full w-10 h-10 p-2"
-            />
-          </div>
+          <Link to="/profile" className="flex justify-center items-center" >
+            <div className="flex-shrink-0 mr-3">
+              <img 
+                src={profile} 
+                alt="user avatar" 
+                className="ring-2 rounded-full w-10 h-10 p-2"
+              />
+            </div>
 
-          <p className="font-in ter font-black">{recipientName}</p>
+            <p className="font-medium">{recipientName}</p>
+          </Link>
+          
         </div>
         
         <div className=""></div>
@@ -119,9 +136,10 @@ export default function DirectChat({ userId }) {
       <MessageList 
         senderId={userId}
         recipientId={recipientId}
+        messagesEndRef={messagesEndRef}
       />
 
-      <fetcher.Form method="post" className="flex items-center rounded-full bg-slate-100 p-5 py-3 mt-5 bottom-0 inset-x-0 fixed z-[100000] w-full ">
+      <fetcher.Form method="post" className="flex items-center rounded-full bg-slate-100 p-5 py-3 mt-5 bottom-0 inset-x-0 sticky z-[100000] w-full shadow-md">
         <input 
           type="text" 
           name="message" 

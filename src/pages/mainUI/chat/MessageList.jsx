@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { generateConversationId } from "./DirectChat";
 import { getFirestore, query, orderBy, onSnapshot, collection, doc, writeBatch, getDoc, } from "firebase/firestore";
@@ -7,6 +7,7 @@ import { getFirestore, query, orderBy, onSnapshot, collection, doc, writeBatch, 
 export default function MessageList({ senderId, recipientId, }) {
 
   const [messages, setMessages] = useState([]);
+  const messagesEndRef = useRef(null);
   const auth = getAuth();
   const conversationId = generateConversationId(senderId, recipientId);
 
@@ -29,6 +30,7 @@ export default function MessageList({ senderId, recipientId, }) {
               }));
               console.log(messageData);
             setMessages(messageData);
+            // scrollToBottom();
           });
 
           return () => unsubscribe(); // Unsubscribe from real-time updates after unmount
@@ -87,24 +89,35 @@ export default function MessageList({ senderId, recipientId, }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversationId, senderId, recipientId]);
 
+  useEffect(() => {
+  // const scrollToBottom = () => {
+      // messagesEndRef.current?.scrollIntoView(false);
+    // };
+
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollTop = messagesEndRef.current.scrollHeight; // Set the messages list to display the bottom everytime the chat is opened or a message in sent from the form.
+    }
+  }, [messages])
+  
+
   const fireMsg = messages.map((msg) => (
-    <ul 
-      className="last:mb-10"
+    
+    <li className={`${msg.senderId === senderId 
+      ? "bg-secondaryblue rounded-l-full rounded-tr-full text-white float-right clear-both w-fit" 
+      : "bg-gray-400 rounded-r-full rounded-tl-full mr-10 float-left clear-both w-fit"
+      } my-2 px-6 py-2 `}
       key={msg.id}
     >
-      <li className={`${msg.senderId === senderId 
-        ? "bg-secondaryblue rounded-l-full rounded-tr-full text-white float-right clear-both w-fit" 
-        : "bg-gray-400 rounded-r-full rounded-tl-full mr-10 float-left clear-both w-fit"
-        } my-2 px-6 py-2 `
-      }>
-        {msg.text}
-      </li>
-    </ul>
+      {msg.text}
+    </li>
   ));
 
   return (
-    <div className="m-4 mb- 24 h-max">
-      {fireMsg}
+    <div className="flex-1 overflow-y-auto p-2 " ref={messagesEndRef} >
+      <ul className="la st:mb-10" >
+        {fireMsg}
+        
+      </ul>
     </div>
   )
 }

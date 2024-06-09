@@ -95,40 +95,51 @@ export default function ConversationsList({ userId }) {
 
       <h2 className="my-4 font-bold font-inter text-sm">Previous Chats</h2>
       <ul className="max-w-lg mx-auto ">
-        {previousConversations?.map((conversation, index) => (
-          <Link 
-            to={`/chat?senderId=${userId}&recipientId=${conversation.uid}&recipientName=${conversation.name}`}
-            className="flex items-center justify-between mb-4 hover:bg-gray-100 transition-all p-2"
-            key={index}
-          >
-            {/* <div className=""> */}
-              <div className="flex-shrink-0 mr-4">
-                <img 
-                  src={conversation.avatar} 
-                  alt="user avatar" 
-                  className="ring-2 rounded-full w-12 h-12"
-                />
-              </div>
-               
-              {/* <div className="ring-2 rounded-[100%] text-center fl ex justify-cent er font-bold ">{userImg}</div> */}
-              <div className="flex-1">
-                <div className="flex items-center justify-between ">
-                  <div className="font-semibold text-lg">{conversation.name}</div>
-                  
-                  <div className="text-gray-500 text-sm">20 April</div>
+        {previousConversations?.map((conversation, index) => {
+
+          const username = conversation.name;
+          const nameArray = username.split("");
+          const userImg = (nameArray[0] + nameArray[1]).toUpperCase();
+
+          return (
+            <Link 
+              to={`/chat?senderId=${userId}&recipientId=${conversation.uid}&recipientName=${conversation.name}`}
+              className="flex items-center justify-between mb-4 hover:bg-gray-100 transition-all p-2"
+              key={index}
+            >
+              {/* <div className=""> */}
+                {/* <div className="flex-shrink-0 mr-4">
+                  <img 
+                    src={userImg} 
+                    alt="user avatar" 
+                    className="ring-2 rounded-full w-12 h-12"
+                  />
+                </div> */}
+                <div className="flex items-center flex-shrink-0 mr-4">
+                    <span className="ring-2 ring-secondaryblue rounded-full px-3 py-2 text-2xl font-bold "
+                    >
+                      {userImg}
+                    </span>
                 </div>
-                
-                <div className="flex justify-between items-center">
-                  <p className="text-gray-600 text-sm mt-1">My message</p>
-                  <div className="flex items-center">
-                    <span className="text-white rounded-full bg-secondaryblue px-2 py-1 text-xs bg-opacity-100">2</span>
+                {/* <div className="ring-2 rounded-[100%] text-center fl ex justify-cent er font-bold ">{userImg}</div> */}
+                <div className="flex-1">
+                  <div className="flex items-center justify-between ">
+                    <div className="font-semibold text-lg">{conversation.name}</div>
+                    
+                    <div className="text-gray-500 text-sm">20 April</div>
+                  </div>
+                  
+                  <div className="flex justify-between items-center">
+                    <p className="text-gray-600 text-sm mt-1">My message</p>
+                    <div className="flex items-center">
+                      <span className="text-white rounded-full bg-secondaryblue px-2 py-1 text-xs bg-opacity-100">2</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            {/* </div> */}
-          </Link>
+              {/* </div> */}
+            </Link>
           
-        ))}
+        )})}
       </ul>
     </div>
   );

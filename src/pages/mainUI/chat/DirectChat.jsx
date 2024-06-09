@@ -1,5 +1,5 @@
 import { addDoc, collection, getFirestore, serverTimestamp } from "firebase/firestore";
-import { useEffect, useState, useRef, } from "react";
+import { useEffect, useRef, } from "react";
 import { useFetcher, useActionData, Link } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import MessageList from "./MessageList";
@@ -161,4 +161,3 @@ export default function DirectChat({ userId }) {
     </div>
   );
 }
-

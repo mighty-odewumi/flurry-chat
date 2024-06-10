@@ -44,8 +44,11 @@ export async function action({ request }) {
 
       if (err?.errorCode === "auth/invalid-credential") {
         errors.firebaseErr = "Invalid password or email supplied!";
-      }
+      }    
 
+      if (err?.errorCode === "auth/user-not-found") {
+        errors.firebaseErr = "No such user found!";
+      } 
       return errors;
   }
 
@@ -69,11 +72,12 @@ export default function SignInPage() {
     const observer = onAuthStateChanged(auth, (user) => {
       if (user) {
         console.log(user);
-        localStorage.setItem("loggedIn", true);
+        // localStorage.setItem("loggedIn", true);
         return navigate("/conversations", { replace: true });
-      } else {
-          localStorage.removeItem("loggedIn");
-      }
+      } 
+      // else {
+      //     // localStorage.removeItem("loggedIn");
+      // }
     });
 
     return () => observer();

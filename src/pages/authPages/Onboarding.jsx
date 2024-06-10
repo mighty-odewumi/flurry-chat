@@ -2,10 +2,15 @@
 import { Form, Link } from "react-router-dom";
 import email from "../../assets/splash-assets/message-icon1.png";
 import password from "../../assets/splash-assets/lock-icon1.png";
+import profile from "../../assets/flurry-assets/profile.png";
+
 import FlurryLogo from "../FlurryLogo";
+import { useAuth } from "../../auth/AuthContext";
 
 
 export default function Onboarding({ errors, navigation, queryString, pathname }) {
+
+  const { user } = useAuth();
 
   return (
     <>
@@ -66,6 +71,27 @@ export default function Onboarding({ errors, navigation, queryString, pathname }
                 && <span className="text-sm ">{errors.password}</span>
             }
           </div>
+
+          {!(pathname === "/signin") && 
+            (<div className="relative mb-4">
+              <img 
+                src={profile} 
+                alt="profile icon" 
+                className="w-4 absolute top-3 left-3"
+              />
+              <input 
+                type="text" 
+                name="username" 
+                id="username" 
+                placeholder="Your username"
+                className="bg-gray-100 w-full py-2 px-9 rounded-md"
+              />
+              {
+                errors?.username 
+                  && <span className="text-sm ">{errors.username}</span>
+              }
+            </div>)
+          }
 
           <button 
             className="rounded-md bg-blue-500 text-white py-2 px-4 w-full mb-4 hover:bg-bluegradient transition-all"

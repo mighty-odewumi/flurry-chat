@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { useActionData, useLoaderData, useNavigate, useNavigation } from "react-router-dom";
+import { redirect, useActionData, useLoaderData, useNavigate, useNavigation } from "react-router-dom";
 import Onboarding from "./Onboarding";
 import { authSignUp } from "../../auth/authSignUp";
 import { useEffect } from "react";
@@ -15,7 +15,8 @@ export async function action({ request }) {
   const formData = await request.formData();
   const email = formData.get("email");
   const password = formData.get("password");
-  console.log(email, password);
+  const username = formData.get("username");
+  console.log(email, password, username);
 
   const errors = {};
 
@@ -27,12 +28,16 @@ export async function action({ request }) {
     errors.password = "Password should not be less than 8 characters!";
   }
 
+  if (typeof password !== "string") {
+    errors.username = "Please input a username!";
+  }
+
   if (Object.keys(errors).length) {
     return errors;
   }
 
   try {
-    const data = await authSignUp(email, password);
+    const data = await authSignUp(email, password, username);
     console.log(data);
    
     // console.log(localStorage);
@@ -53,6 +58,10 @@ export async function action({ request }) {
         errors.firebaseErr = "Email already in use!";
       }      
 
+      if (err?.errorCode === "auth/user-not-found") {
+        errors.firebaseErr = "No such user found!";
+      } 
+
       return errors;
   }
   return null;
@@ -69,17 +78,17 @@ export default function SignUpPage() {
   const navigation = useNavigation();
   const navigate = useNavigate();
   
-  
-
   useEffect(() => {
     const observer = onAuthStateChanged(auth, (user) => {
       if (user) {
         console.log(user);
-        localStorage.setItem("loggedIn", true);
+        // localStorage.setItem("loggedIn", true);
         return navigate("/conversations", { replace: true });
-      } else {
-          localStorage.removeItem("loggedIn");
-      }
+      } 
+      // else {
+      //     // localStorage.removeItem("loggedIn");
+      //     redirect("/signin?message=You are not signed in!")
+      // }
     });
 
     return () => observer();

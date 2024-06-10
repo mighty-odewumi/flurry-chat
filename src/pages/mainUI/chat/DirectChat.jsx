@@ -6,6 +6,7 @@ import MessageList from "./MessageList";
 import send from "../../../assets/flurry-assets/sendIcon2.png";
 import back from "../../../assets/flurry-assets/back.png";
 import profile from "../../../assets/flurry-assets/profile.png";
+import { useAuth } from "../../../auth/AuthContext";
 
 
 // Create conversation
@@ -74,10 +75,11 @@ export async function action({ request }) {
 }
 
 // eslint-disable-next-line react/prop-types
-export default function DirectChat({ userId }) {
+export default function DirectChat() {
 
   const fetcher = useFetcher();
   const status = fetcher.formData?.get("message");
+  const { user } = useAuth();
 
   const messagesEndRef = useRef(null); // Set a ref to update the UI to the bottom of the chat list.
 
@@ -135,7 +137,6 @@ export default function DirectChat({ userId }) {
       <div className="border-b-2"></div>
       {/* <br /> */}
       <MessageList 
-        senderId={userId}
         recipientId={recipientId}
         messagesEndRef={messagesEndRef}
       />

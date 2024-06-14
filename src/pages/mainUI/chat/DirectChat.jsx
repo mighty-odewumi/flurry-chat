@@ -1,4 +1,4 @@
-import { addDoc, collection, getFirestore, serverTimestamp } from "firebase/firestore";
+import { addDoc, collection, getFirestore, doc, serverTimestamp, updateDoc,setDoc, } from "firebase/firestore";
 import { useEffect, useRef, } from "react";
 import { useFetcher, useActionData, Link } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
@@ -10,7 +10,7 @@ import { useAuth } from "../../../auth/AuthContext";
 
 
 // Create conversation
-async function createConversation(senderId, recipientId) {
+async function createConversation(senderId, recipientId, text) {
   try {
     const db = getFirestore();
     const conversationsRef = collection(db, "conversations");
@@ -18,7 +18,9 @@ async function createConversation(senderId, recipientId) {
       senderId,
       recipientId,
       participants: [senderId, recipientId],
-      lastTimestamp: serverTimestamp(),
+      // lastTimestamp: serverTimestamp(),
+      lastMessageTimestamp: serverTimestamp(),
+      lastMessage: "",
     });
   } catch (error) {
     console.log("Unable to create conversation", error);
@@ -29,7 +31,7 @@ async function createConversation(senderId, recipientId) {
 async function sendMessage(senderId, recipientId, text) {
   try {
     const db = getFirestore();
-    await createConversation(senderId, recipientId);
+    await createConversation(senderId, recipientId, text);
     const eachMessageId = generateMessageId();
     const conversationId = generateConversationId(senderId, recipientId);
     const messageRef = collection(db, `conversations/${conversationId}/messages`);
@@ -41,7 +43,28 @@ async function sendMessage(senderId, recipientId, text) {
       timestamp: serverTimestamp(),
       senderId,
       readBy: [senderId], // Initialize readBy with senderId
-    }); 
+    })
+    // .then(async () => {
+    //   // Update the conversation's lastMessage and lastMessageTimestamp fields
+    //   console.log("Text is", text);
+    //   const conversationRef = doc(db, `conversations/${conversationId}`);
+    //   console.log("Text is", text);
+    //   await setDoc(conversationRef, {
+    //     lastMessage: text,
+    //     lastMessageTimestamp: serverTimestamp()}, 
+    //     {merge: true}, 
+    //   );
+    // })
+
+    // console.log("Text is", text);
+    // // Update the conversation's lastMessage and lastMessageTimestamp fields
+    const conversationRef = doc(db, `conversations/${conversationId}`);
+    console.log("Text is", text);
+    await setDoc(conversationRef, {
+      lastMessage: text,
+      lastMessageTimestamp: serverTimestamp()}, 
+      {merge: true}, 
+    );
 
     console.log("Message sent successfully");
   } catch (error) {

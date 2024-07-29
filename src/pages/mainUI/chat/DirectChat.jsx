@@ -1,4 +1,4 @@
-import { addDoc, collection, getFirestore, doc, serverTimestamp, updateDoc,setDoc, } from "firebase/firestore";
+import { addDoc, collection, getFirestore, doc, serverTimestamp, updateDoc, setDoc, getDoc,} from "firebase/firestore";
 import { useEffect, useRef, } from "react";
 import { useFetcher, useActionData, Link } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
@@ -10,28 +10,35 @@ import { useAuth } from "../../../auth/AuthContext";
 
 
 // Create conversation
-async function createConversation(senderId, recipientId, text) {
+async function createConversation(senderId, recipientId, text, senderName, recipientName) {
   try {
     const db = getFirestore();
     const conversationsRef = collection(db, "conversations");
-    await addDoc(conversationsRef, {
+    const newConversationRef = await addDoc(conversationsRef, {
       senderId,
       recipientId,
       participants: [senderId, recipientId],
+      users: [
+        { id: senderId, name: senderName },
+        { id: recipientId, name: recipientName },
+      ],
       // lastTimestamp: serverTimestamp(),
       lastMessageTimestamp: serverTimestamp(),
       lastMessage: "",
     });
+
+    console.log("Conversation created", newConversationRef.id);
+    return newConversationRef.id;
   } catch (error) {
     console.log("Unable to create conversation", error);
   }
 }
 
 // Sends message
-async function sendMessage(senderId, recipientId, text) {
+async function sendMessage(senderId, recipientId, text, recipientName, senderName) {
   try {
     const db = getFirestore();
-    await createConversation(senderId, recipientId, text);
+    await createConversation(senderId, recipientId, text, senderName, recipientName);
     const eachMessageId = generateMessageId();
     const conversationId = generateConversationId(senderId, recipientId);
     const messageRef = collection(db, `conversations/${conversationId}/messages`);
@@ -60,11 +67,23 @@ async function sendMessage(senderId, recipientId, text) {
     // // Update the conversation's lastMessage and lastMessageTimestamp fields
     const conversationRef = doc(db, `conversations/${conversationId}`);
     console.log("Text is", text);
-    await setDoc(conversationRef, {
-      lastMessage: text,
-      lastMessageTimestamp: serverTimestamp()}, 
-      {merge: true}, 
-    );
+    const conversationDoc = await getDoc(conversationRef);
+
+    if (conversationDoc.exists()) {
+      await updateDoc(conversationRef, {
+        lastMessage: text,
+        lastMessageTimestamp: serverTimestamp()}, 
+        // {merge: true}, 
+      );
+    } else {
+      // Create conversation with the last message ad timestamp
+      await setDoc(conversationRef, {
+        participants: [senderId, recipientId],
+        lastMessage: text,
+        lastMessageTimestamp: serverTimestamp(),
+      });
+    }
+    
 
     console.log("Message sent successfully");
   } catch (error) {
@@ -93,8 +112,10 @@ export async function action({ request }) {
   const queryParams = new URLSearchParams(searchParams);
   const senderId = queryParams.get("senderId");
   const recipientId = queryParams.get("recipientId");
-  message && await sendMessage(senderId, recipientId, message);
-  return (senderId, recipientId);  
+  const recipientName = queryParams.get("recipientName");
+  const senderName = queryParams.get("senderName");
+  message && await sendMessage(senderId, recipientId, message, senderName, recipientName);
+  return (senderId, recipientId, senderName, recipientName);  
 }
 
 // eslint-disable-next-line react/prop-types
@@ -102,7 +123,7 @@ export default function DirectChat() {
 
   const fetcher = useFetcher();
   const status = fetcher.formData?.get("message");
-  const { user } = useAuth();
+  // const { user } = useAuth();
 
   const messagesEndRef = useRef(null); // Set a ref to update the UI to the bottom of the chat list.
 

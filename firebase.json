@@ -9,6 +9,23 @@
     "ui": {
       "enabled": true
     },
-    "singleProjectMode": true
+    "singleProjectMode": true,
+    "hosting": {
+      "port": 5170
+    }
+  },
+  "hosting": {
+    "public": "dist",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
   }
 }

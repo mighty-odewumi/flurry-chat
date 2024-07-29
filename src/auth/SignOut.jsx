@@ -31,11 +31,11 @@ export default function SignOut() {
     const observer = onAuthStateChanged(auth, (user) => {
       if (user) {
         console.log(user);
-        localStorage.setItem("loggedIn", true);
+        // localStorage.setItem("loggedIn", true);
         return navigate("/conversations", { replace: true });
       } else {
-          localStorage.removeItem("loggedIn");
-          return navigate("/signin?error=(From SignOut) - You need to be signed in!!!");
+          // localStorage.removeItem("loggedIn");
+          return navigate("/signin?error=You have been signed out!");
       }
     });
 

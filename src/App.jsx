@@ -3,6 +3,7 @@ import {
   createBrowserRouter,
   Route,
   RouterProvider,
+  redirect,
 } from "react-router-dom";
 
 // Import the functions you need from the SDKs you need
@@ -36,10 +37,12 @@ import SignUpPage, {
   loader as signUpLoginLoader 
 } from "./pages/authPages/SignUpPage";
 
-import { requireAuth } from "./auth/requireAuth";
+import { RequireAuth, } from "./auth/requireAuth";
 import SignOut from "./auth/SignOut";
 import DirectChat, { action as chatAction } from "./pages/mainUI/chat/DirectChat";
 import ConversationsList from "./pages/mainUI/chat/ConversationsList";
+import AuthProvider, { useAuth } from "./auth/AuthContext";
+import Profile from "./pages/mainUI/userProfile/Profile";
 // import { saveMessagingDeviceToken } from "./firebase/messaging";
 // import { getAccessToken } from "./utils/getAccessToken";
 // import { notificationCall } from "./utils/notificationCall";
@@ -58,7 +61,10 @@ export default function App() {
 
   const db = getFirestore();
 
-  const [userId, setUserId] = useState(null);
+  const { user } = useAuth();
+  
+
+  // localStorage.clear();
 
   // saveMessagingDeviceToken();
 
@@ -66,29 +72,20 @@ export default function App() {
   //   credential: admin.credential.applicationDefault(),
   // });
 
-  // if (location.hostname === "localhost") {
-  //   connectAuthEmulator(auth, "http://localhost:9099");
-  //   connectFirestoreEmulator(db, "localhost", "5180");
-  // }
+  // useEffect(() => {
+  //   const auth = getAuth(app);
+  //   const observer = onAuthStateChanged(auth, user => {
+  //     if (user) {
+  //       setUserId(user.uid);
+  //     } else {
+  //       setUserId(null);
+  //     }
+  //   });
 
-  useEffect(() => {
-    const auth = getAuth(app);
-    const observer = onAuthStateChanged(auth, user => {
-      if (user) {
-        setUserId(user.uid);
-      } else {
-        setUserId(null);
-      }
-    });
 
-    if (location.hostname === "localhost") {
-      connectAuthEmulator(auth, "http://localhost:9099");
-      connectFirestoreEmulator(db, "localhost", "5180");
-    }
-
-    return () => observer();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  //   return () => observer();
+  // // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
 
 
   const router = createBrowserRouter(createRoutesFromElements(
@@ -116,36 +113,49 @@ export default function App() {
         path="/conversations"
         element={
           <>
-            <ConversationsList 
-              userId={userId}
-            />
+            <ConversationsList />
             {/* <SignOut /> */}
           </>
         }
-        loader={async () => await requireAuth()}
+        loader={async () => {
+          if (!user) {
+            throw redirect("/signin?message=You are not logged in!");
+          }
+
+          return null;
+        }}
       />
 
       <Route 
         path={`/chat`}
         element={
           <>
-            <h1>Chat component</h1>
-            <DirectChat 
-              userId={userId}
-            />
+            <DirectChat />
           </>
         }
         action={chatAction}
-        loader={async () => await requireAuth()}
+        loader={async () => {
+          if (!user) {
+            throw redirect("/signin?message=You are not logged in!");
+          }
+
+          return null;
+        }}
       />
       
+      <Route 
+        path="/profile"
+        element={<Profile />}
+      />
     </>
   ));
   
 
   return (
     <>
-      <RouterProvider router={router} />
+      {/* <AuthProvider> */}
+        <RouterProvider router={router} />
+      {/* </AuthProvider> */}
     </>
   )
 }

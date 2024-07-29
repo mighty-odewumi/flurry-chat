@@ -1,30 +1,44 @@
-import { addDoc, collection, getFirestore, serverTimestamp } from "firebase/firestore";
-// import { useEffect, useState } from "react";
-import { useFetcher, useActionData } from "react-router-dom";
+import { addDoc, collection, getFirestore, doc, serverTimestamp, updateDoc, setDoc, getDoc,} from "firebase/firestore";
+import { useEffect, useRef, } from "react";
+import { useFetcher, useActionData, Link } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import MessageList from "./MessageList";
+import send from "../../../assets/flurry-assets/sendIcon2.png";
+import back from "../../../assets/flurry-assets/back.png";
+import profile from "../../../assets/flurry-assets/profile.png";
+import { useAuth } from "../../../auth/AuthContext";
+
 
 // Create conversation
-async function createConversation(senderId, recipientId) {
+async function createConversation(senderId, recipientId, text, senderName, recipientName) {
   try {
     const db = getFirestore();
     const conversationsRef = collection(db, "conversations");
-    await addDoc(conversationsRef, {
+    const newConversationRef = await addDoc(conversationsRef, {
       senderId,
       recipientId,
       participants: [senderId, recipientId],
-      lastTimestamp: serverTimestamp(),
+      users: [
+        { id: senderId, name: senderName },
+        { id: recipientId, name: recipientName },
+      ],
+      // lastTimestamp: serverTimestamp(),
+      lastMessageTimestamp: serverTimestamp(),
+      lastMessage: "",
     });
+
+    console.log("Conversation created", newConversationRef.id);
+    return newConversationRef.id;
   } catch (error) {
     console.log("Unable to create conversation", error);
   }
 }
 
 // Sends message
-async function sendMessage(senderId, recipientId, text) {
+async function sendMessage(senderId, recipientId, text, recipientName, senderName) {
   try {
     const db = getFirestore();
-    await createConversation(senderId, recipientId);
+    await createConversation(senderId, recipientId, text, senderName, recipientName);
     const eachMessageId = generateMessageId();
     const conversationId = generateConversationId(senderId, recipientId);
     const messageRef = collection(db, `conversations/${conversationId}/messages`);
@@ -33,8 +47,43 @@ async function sendMessage(senderId, recipientId, text) {
     await addDoc(messageRef, {
       eachMessageId,
       text,
-      timestamp: serverTimestamp()
-    }); 
+      timestamp: serverTimestamp(),
+      senderId,
+      readBy: [senderId], // Initialize readBy with senderId
+    })
+    // .then(async () => {
+    //   // Update the conversation's lastMessage and lastMessageTimestamp fields
+    //   console.log("Text is", text);
+    //   const conversationRef = doc(db, `conversations/${conversationId}`);
+    //   console.log("Text is", text);
+    //   await setDoc(conversationRef, {
+    //     lastMessage: text,
+    //     lastMessageTimestamp: serverTimestamp()}, 
+    //     {merge: true}, 
+    //   );
+    // })
+
+    // console.log("Text is", text);
+    // // Update the conversation's lastMessage and lastMessageTimestamp fields
+    const conversationRef = doc(db, `conversations/${conversationId}`);
+    console.log("Text is", text);
+    const conversationDoc = await getDoc(conversationRef);
+
+    if (conversationDoc.exists()) {
+      await updateDoc(conversationRef, {
+        lastMessage: text,
+        lastMessageTimestamp: serverTimestamp()}, 
+        // {merge: true}, 
+      );
+    } else {
+      // Create conversation with the last message ad timestamp
+      await setDoc(conversationRef, {
+        participants: [senderId, recipientId],
+        lastMessage: text,
+        lastMessageTimestamp: serverTimestamp(),
+      });
+    }
+    
 
     console.log("Message sent successfully");
   } catch (error) {
@@ -63,15 +112,20 @@ export async function action({ request }) {
   const queryParams = new URLSearchParams(searchParams);
   const senderId = queryParams.get("senderId");
   const recipientId = queryParams.get("recipientId");
-  await sendMessage(senderId, recipientId, message);
-  return (senderId, recipientId);  
+  const recipientName = queryParams.get("recipientName");
+  const senderName = queryParams.get("senderName");
+  message && await sendMessage(senderId, recipientId, message, senderName, recipientName);
+  return (senderId, recipientId, senderName, recipientName);  
 }
 
 // eslint-disable-next-line react/prop-types
-export default function DirectChat({ userId }) {
+export default function DirectChat() {
 
   const fetcher = useFetcher();
   const status = fetcher.formData?.get("message");
+  // const { user } = useAuth();
+
+  const messagesEndRef = useRef(null); // Set a ref to update the UI to the bottom of the chat list.
 
   const isComplete = fetcher.state === "submitting";
   const actionData = useActionData();
@@ -80,32 +134,75 @@ export default function DirectChat({ userId }) {
   const searchParams = location.search;
   const queryParams = new URLSearchParams(searchParams);
   const recipientId = queryParams.get("recipientId");
+  const recipientName = queryParams.get("recipientName");
+
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      // if (fetcher.state === "submitting") {
+      //   const lastMessageElement = messagesEndRef.current.lastChild;
+      //   lastMesssageElement.scrollIntoView();
+      // } else {
+      //   messagesEndRef.current.scrollTop = messagesEndRef.current.scrollHeight;
+      // }
+      messagesEndRef.current.focus(); // Set the bottom of the messages list to the position to be viewed infinitely unless scrolled up.
+    }
+  }, [])
+
 
   return (
-    <>
-      
-      <br />
-      <MessageList 
-        conversationId={"hello"}
-        senderId={userId}
-        recipientId={recipientId}
-      />
-      <br />
+    <div className="flex h-screen flex-col">
 
-      <fetcher.Form method="post">
+      <div className="flex items-center justify-between m-4">
+        <Link to="/conversations">
+          <img 
+            src={back} 
+            alt="back button" 
+          />
+        </Link>
+
+        <div className="flex items-center ">
+          <Link to="/profile" className="flex justify-center items-center" >
+            <div className="flex-shrink-0 mr-3">
+              <img 
+                src={profile} 
+                alt="user avatar" 
+                className="ring-2 rounded-full w-10 h-10 p-2"
+              />
+            </div>
+
+            <p className="font-medium">{recipientName}</p>
+          </Link>
+          
+        </div>
+        
+        <div className=""></div>
+      </div>
+      
+      <div className="border-b-2"></div>
+      {/* <br /> */}
+      <MessageList 
+        recipientId={recipientId}
+        messagesEndRef={messagesEndRef}
+      />
+
+      <fetcher.Form method="post" className="flex items-center rounded-full bg-primarygray p-5 py-3 mt-5 bottom-0 inset-x-0 sticky z-[100000] w-full shadow-md">
         <input 
           type="text" 
           name="message" 
           id="message" 
-          placeholder="Enter your message"
+          placeholder="Type your message here..."
           value={ isComplete ? "" : status }
-          className="ring-2"
+          className="bg-transparent outline-0 mr-auto w-full "
         />
 
-        <button>
-          Send Message
+        <button >
+          <img 
+            src={send} 
+            alt="Send button" 
+            className="h-6 mx-3 hover:h-7 hover:cursor-pointer transition-all " 
+          />
         </button>
       </fetcher.Form>
-    </>
+    </div>
   );
 }

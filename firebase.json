@@ -1,7 +1,7 @@
 {
   "emulators": {
     "auth": {
-      "port": 9099
+      "port": 5150
     },
     "firestore": {
       "port": 5180
@@ -9,6 +9,23 @@
     "ui": {
       "enabled": true
     },
-    "singleProjectMode": true
+    "singleProjectMode": true,
+    "hosting": {
+      "port": 5170
+    }
+  },
+  "hosting": {
+    "public": "dist",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
   }
 }

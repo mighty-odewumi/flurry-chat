@@ -47,6 +47,7 @@ export default function ConversationsList({ userId }) {
 
   useEffect(() => {
     fetchConversations();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
   return (

@@ -121,15 +121,7 @@ const Conversations = ({userId}) => {
                   className="justify-between mb-4 hover:bg-gray-50 transition-all flex items-center space-x-4"
                   key={uid}
                 >
-                  <div
-                    className={`rounded-full border-2 border- blue-500 overflow-hidden p-2 bg-gray-50`}
-                  >
-                    <User 
-                      userImg={userImg} 
-                      className="w-8 h-8" 
-                    />
-                    {/* {userImg} */}
-                  </div>
+                  <Avatar userImg={userImg} />
                   <div className="flex-1">
                     <h3 className="font-semibold">{username}</h3>
                     <p className="text-gray-600 text-sm">{lastMessage}</p>

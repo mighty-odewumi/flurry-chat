@@ -10,9 +10,10 @@ const Avatar = ({ src, name, className, onClick, userImg }) => (
       </div>
     )}
 
+    {/* User Image for now is just the first two letters of the user's name for now*/}
     {userImg && (
-      <div className="flex items-center">
-        <span className="ring-2 ring-secondaryblue rounded-full px-3 py-2 text-2xl font-bold "
+      <div className="rounded-full border-2 border-blue-300 bg-gray-100 flex items-center justify-center w-12 h-12">
+        <span className="text-gray-700 font-semibold "
         >
           {userImg}
         </span>

@@ -1,12 +1,13 @@
-import { addDoc, collection, getFirestore, doc, serverTimestamp, updateDoc, setDoc, getDoc,} from "firebase/firestore";
-import { useEffect, useRef, } from "react";
-import { useFetcher, useActionData, Link } from "react-router-dom";
+/* eslint-disable react/prop-types */
+import { addDoc, collection, getFirestore, doc, serverTimestamp, updateDoc, setDoc, getDoc, query, orderBy, onSnapshot,} from "firebase/firestore";
+import { useEffect, useRef, useState,} from "react";
+import { useFetcher, useActionData, Link, useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
-import MessageList from "./MessageList";
-import send from "../../../assets/flurry-assets/sendIcon2.png";
-import back from "../../../assets/flurry-assets/back.png";
-import profile from "../../../assets/flurry-assets/profile.png";
+import Messages from "./Messages";
 import { useAuth } from "../../../auth/AuthContext";
+import { ArrowLeft, MoreVertical, Send } from 'lucide-react';
+import Image from "../../../assets/splash-assets/splash3.jpg";
+import ChatAvatar from "./components/avatars/ChatAvatar";
 
 
 // Create conversation
@@ -22,12 +23,11 @@ async function createConversation(senderId, recipientId, text, senderName, recip
         { id: senderId, name: senderName },
         { id: recipientId, name: recipientName },
       ],
-      // lastTimestamp: serverTimestamp(),
       lastMessageTimestamp: serverTimestamp(),
       lastMessage: "",
     });
 
-    console.log("Conversation created", newConversationRef.id);
+    // console.log("Conversation created", newConversationRef.id);
     return newConversationRef.id;
   } catch (error) {
     console.log("Unable to create conversation", error);
@@ -51,19 +51,7 @@ async function sendMessage(senderId, recipientId, text, recipientName, senderNam
       senderId,
       readBy: [senderId], // Initialize readBy with senderId
     })
-    // .then(async () => {
-    //   // Update the conversation's lastMessage and lastMessageTimestamp fields
-    //   console.log("Text is", text);
-    //   const conversationRef = doc(db, `conversations/${conversationId}`);
-    //   console.log("Text is", text);
-    //   await setDoc(conversationRef, {
-    //     lastMessage: text,
-    //     lastMessageTimestamp: serverTimestamp()}, 
-    //     {merge: true}, 
-    //   );
-    // })
 
-    // console.log("Text is", text);
     // // Update the conversation's lastMessage and lastMessageTimestamp fields
     const conversationRef = doc(db, `conversations/${conversationId}`);
     console.log("Text is", text);
@@ -76,7 +64,7 @@ async function sendMessage(senderId, recipientId, text, recipientName, senderNam
         // {merge: true}, 
       );
     } else {
-      // Create conversation with the last message ad timestamp
+      // Create conversation with the last message and timestamp
       await setDoc(conversationRef, {
         participants: [senderId, recipientId],
         lastMessage: text,
@@ -84,7 +72,6 @@ async function sendMessage(senderId, recipientId, text, recipientName, senderNam
       });
     }
     
-
     console.log("Message sent successfully");
   } catch (error) {
       console.log("Error occurred while sending message!", error);
@@ -118,12 +105,16 @@ export async function action({ request }) {
   return (senderId, recipientId, senderName, recipientName);  
 }
 
+
 // eslint-disable-next-line react/prop-types
 export default function DirectChat() {
+  const [messages, setMessages] = useState([]);
 
   const fetcher = useFetcher();
   const status = fetcher.formData?.get("message");
-  // const { user } = useAuth();
+  const { user } = useAuth();
+
+  const navigate = useNavigate();
 
   const messagesEndRef = useRef(null); // Set a ref to update the UI to the bottom of the chat list.
 
@@ -136,73 +127,109 @@ export default function DirectChat() {
   const recipientId = queryParams.get("recipientId");
   const recipientName = queryParams.get("recipientName");
 
-  useEffect(() => {
-    if (messagesEndRef.current) {
-      // if (fetcher.state === "submitting") {
-      //   const lastMessageElement = messagesEndRef.current.lastChild;
-      //   lastMesssageElement.scrollIntoView();
-      // } else {
-      //   messagesEndRef.current.scrollTop = messagesEndRef.current.scrollHeight;
-      // }
-      messagesEndRef.current.focus(); // Set the bottom of the messages list to the position to be viewed infinitely unless scrolled up.
-    }
-  }, [])
+  const conversationId = generateConversationId(user?.uid, recipientId);
 
+  useEffect(() => {
+    // eslint-disable-next-line no-unused-vars
+
+    if (!user) return;
+    async function fetchMessages() {
+      try {
+        const db = getFirestore();
+        const conversationRef = collection(db, `conversations/${conversationId}/messages`);
+        const messagesQuery = query(conversationRef, orderBy("timestamp"));
+
+        // Listen for real-time updates 
+        const unsubscribe = onSnapshot(messagesQuery, (snapshot) => {
+          const messageData = snapshot.docs.map(doc =>({
+              id: doc.id,
+              ...doc.data(),
+              readBy: doc.data().readBy || [doc.data().senderId], // Initialize readBy with senderId
+            }));
+            // console.log(messageData);
+          setMessages(messageData);
+        });
+
+        return () => unsubscribe(); // Unsubscribe from real-time updates after unmount
+
+      } catch (error) {
+          console.log("Error fetching messages:", error);
+      }
+    }
+
+    if (conversationId) {      
+      fetchMessages();
+      // markMessagesAsRead(messages, user?.uid); // Mark existing messages as read
+    }
+   
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conversationId, user, recipientId]);
+  console.log("Messages", messages);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }
+  
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages])
 
   return (
     <div className="flex h-screen flex-col">
 
-      <div className="flex items-center justify-between m-4">
-        <Link to="/conversations">
-          <img 
-            src={back} 
-            alt="back button" 
-          />
-        </Link>
-
-        <div className="flex items-center ">
-          <Link to="/profile" className="flex justify-center items-center" >
-            <div className="flex-shrink-0 mr-3">
-              <img 
-                src={profile} 
-                alt="user avatar" 
-                className="ring-2 rounded-full w-10 h-10 p-2"
-              />
-            </div>
-
-            <p className="font-medium">{recipientName}</p>
-          </Link>
-          
-        </div>
-        
-        <div className=""></div>
-      </div>
-      
-      <div className="border-b-2"></div>
-      {/* <br /> */}
-      <MessageList 
-        recipientId={recipientId}
-        messagesEndRef={messagesEndRef}
-      />
-
-      <fetcher.Form method="post" className="flex items-center rounded-full bg-primarygray p-5 py-3 mt-5 bottom-0 inset-x-0 sticky z-[100000] w-full shadow-md">
-        <input 
-          type="text" 
-          name="message" 
-          id="message" 
-          placeholder="Type your message here..."
-          value={ isComplete ? "" : status }
-          className="bg-transparent outline-0 mr-auto w-full "
-        />
-
-        <button >
-          <img 
-            src={send} 
-            alt="Send button" 
-            className="h-6 mx-3 hover:h-7 hover:cursor-pointer transition-all " 
-          />
+      <header className="flex items-center p-4 border-b border-gray-200">
+        <button className="mr-4" onClick={() => navigate("/conversations")}>
+          <ArrowLeft className="h-6 w-6 text-gray-600" />
         </button>
-      </fetcher.Form>
+        <ChatAvatar src={Image} alt={recipientName} className="mr-3" />
+        <h1 className="text-lg font-semibold flex-grow">{recipientName}</h1>
+        <button className="ml-2" >
+          <MoreVertical className="h-6 w-6 text-gray-600" />
+        </button>
+      </header>
+
+      <main className="flex-grow overflow-y-auto p-4 flex flex-col-reverse">
+        <div ref={messagesEndRef} />
+        
+        {messages.slice().reverse().map((msg) => (
+          <Messages 
+            msg={msg}
+            key={msg.id}
+            user={user}
+            avatar={Image}
+          />
+
+        ))}
+        <div className="text-center text-sm text-gray-500 my-2">Today</div>
+
+      </main>
+
+      <footer className="p-4 border-t border-gray-200">
+        <fetcher.Form 
+          className="flex items-center bg-gray-100 rounded-full"
+          method="POST"        
+        >
+          <input
+            type="text"
+            className="flex-grow bg-transparent px-4 py-2 focus:outline-none"
+            // value={inputMessage}
+            name="message" 
+            id="message" 
+            placeholder="Type your message here..."
+            value={ isComplete ? "" : status }
+            // onChange={(e) => setInputMessage(e.target.value)}
+            // onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+          />
+          <button 
+            className="p-2" 
+            // onClick={handleSendMessage}
+          >
+            <Send className="h-6 w-6 text-blue-500" />
+          </button>
+        </fetcher.Form>
+      </footer>
+
+      
     </div>
   );
 }

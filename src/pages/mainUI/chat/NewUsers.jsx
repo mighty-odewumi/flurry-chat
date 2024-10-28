@@ -3,7 +3,7 @@ import { useState, useEffect, } from "react";
 import { getFirestore, collection, onSnapshot } from "firebase/firestore";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../../auth/AuthContext";
-import Avatar from "../chat/components/Avatar";
+import Avatar from "../chat/components/avatars/Avatar";
 import Image from "../../../assets/splash-assets/splash11.jpg";
 
 
@@ -58,7 +58,7 @@ export default function NewUsers() {
                   className="flex flex-col items-center"
                 >
                   <Avatar src={Image} className="w-12 h-12" />
-                  <span className="mt-2 text-sm">{newUser.username}</span>
+                  <span className="mt-2 text-sm">{user?.uid === newUser.uid ? "My Account (You)" : newUser.username}</span>
                 </div>
               </Link>
             )

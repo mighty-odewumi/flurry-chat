@@ -5,14 +5,16 @@ import NewUsers from "./NewUsers";
 import { Link } from "react-router-dom";
 import { Bell, LogOut, Search, Settings, User } from 'lucide-react';
 import Avatar from './components/Avatar';
+import Image from "../../../assets/splash-assets/splash5.jpg";
 
+/* We can have a list of predefined avatars and have users choose from them first during signup */
 
-const CurrentUser = ({onClick}) => (
+const CurrentUser = ({onClick, className}) => (
   <div
     className={`cursor-pointer`}
     onClick={onClick}
   >
-    <User />
+    <User className={`${className}`}/>
   </div>
 );
 
@@ -83,13 +85,13 @@ const Conversations = ({userId}) => {
 
   return (
     <div className="flex flex-col h-screen bg-white">
-      <header className="flex justify-between items-center p-4 border-b border-gray-200">
-        <h1 className="text-2xl font-bold">flurry</h1>
+      <header className="flex justify-between items-center p-4 border-b border-gray-200 bg-facebookblue">
+        <h1 className="text-2xl text-white font-bold">flurry</h1>
         <div className="flex items-center space-x-4">
-          <Bell className="h-6 w-6 text-gray-600" />
+          <Bell className="h-6 w-6 text- gray-600 text-white" />
           <div className="relative">
             <CurrentUser
-              className="h-6 w-6 text-gray-600" 
+              className="h-6 w-6 text-gr ay-600 text-white" 
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             />
             <DropdownMenu isOpen={isDropdownOpen} onClose={() => setIsDropdownOpen(false)} />
@@ -121,7 +123,7 @@ const Conversations = ({userId}) => {
                   className="justify-between mb-4 hover:bg-gray-50 transition-all flex items-center space-x-4"
                   key={uid}
                 >
-                  <Avatar userImg={userImg} />
+                  <Avatar src={Image} className="w-14 h-14"/>
                   <div className="flex-1">
                     <h3 className="font-semibold">{username}</h3>
                     <p className="text-gray-600 text-sm">{lastMessage}</p>

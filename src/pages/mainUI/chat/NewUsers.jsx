@@ -4,6 +4,8 @@ import { getFirestore, collection, onSnapshot } from "firebase/firestore";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../../auth/AuthContext";
 import Avatar from "../chat/components/Avatar";
+import Image from "../../../assets/splash-assets/splash11.jpg";
+
 
 // eslint-disable-next-line no-unused-vars
 export default function NewUsers() {
@@ -55,7 +57,7 @@ export default function NewUsers() {
                   key={newUser.id} 
                   className="flex flex-col items-center"
                 >
-                  <Avatar userImg={userImg} />
+                  <Avatar src={Image} className="w-12 h-12" />
                   <span className="mt-2 text-sm">{newUser.username}</span>
                 </div>
               </Link>

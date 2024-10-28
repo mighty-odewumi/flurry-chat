@@ -11,6 +11,7 @@ export default {
         bluegradient: "#2448b1",
         secondaryblue: "#494dd3",
         primarygray: "#eaf4f4", 
+        facebookblue: "#1877f2",
         // primarygray: "gray-50",
       },
       fontFamily: {

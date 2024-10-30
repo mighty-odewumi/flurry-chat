@@ -18,18 +18,17 @@ const CurrentUser = ({onClick, className}) => (
   </div>
 );
 
-const DropdownMenu = ({ isOpen, onClose }) => {
+const DropdownMenu = ({ isOpen, onClose, userId }) => {
   if (!isOpen) return null;
 
   return (
     <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
-      <Link to="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+      <Link to={`/profile`} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
         <Settings className="inline-block mr-2 h-4 w-4" />
         Profile Settings
       </Link>
       <button 
         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-        // onClick={true}
       >
         <LogOut className="inline-block mr-2 h-4 w-4" />
         Logout
@@ -85,6 +84,11 @@ const Conversations = ({userId}) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
+  console.log(previousConversations);
+  if (!previousConversations) {
+    return <div>Loading...</div>
+  }
+
   return (
     <div className="flex flex-col h-screen bg-white">
       <header className="flex justify-between items-center p-4 border-b border-gray-200 bg-facebookblue">
@@ -113,7 +117,7 @@ const Conversations = ({userId}) => {
               className="h-6 w-6 text-gr ay-600 text-white" 
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             />
-            <DropdownMenu isOpen={isDropdownOpen} onClose={() => setIsDropdownOpen(false)} />
+            <DropdownMenu isOpen={isDropdownOpen} onClose={() => setIsDropdownOpen(false)} userId={userId}/>
           </div>
         </div>
       </header>
@@ -128,10 +132,19 @@ const Conversations = ({userId}) => {
         </div>*/}
 
         <NewUsers />
-
+       
         <div>
           <h2 className="text-xl font-semibold mb-4">flurs</h2>
+
+          {(previousConversations.length < 1) && 
+            <div>
+              Start a conversation with a flurry (another user) now! ;)
+            </div>
+          }
+
+
           <div className="space-y-4">
+            
             {previousConversations.map((chat) => {
               const { uid, username, lastMessage, lastMessageTimestamp } = chat;
               const userImg = username.slice(0, 2).toUpperCase();

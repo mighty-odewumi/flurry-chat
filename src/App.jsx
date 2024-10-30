@@ -9,7 +9,6 @@ import {
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getMessaging } from "firebase/messaging";
-import { getFirestore } from "firebase/firestore";
 
 // Firebase Config
 import { firebaseConfig } from "./config";
@@ -34,28 +33,19 @@ import SignUpPage, {
   loader as signUpLoginLoader 
 } from "./pages/authPages/SignUpPage";
 
-import SignOut from "./auth/SignOut";
 import DirectChat, { action as chatAction } from "./pages/mainUI/chat/DirectChat";
 import Conversations from "./pages/mainUI/chat/Conversations";
-import AuthProvider, { useAuth } from "./auth/AuthContext";
+import { useAuth } from "./auth/AuthContext";
 import Profile from "./pages/mainUI/userProfile/Profile";
 // import { saveMessagingDeviceToken } from "./firebase/messaging";
 // import { getAccessToken } from "./utils/getAccessToken";
 // import { notificationCall } from "./utils/notificationCall";
 
-// console.log(localStorage.clear());
-
-
 export default function App() {
 
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
-  // const analytics = getAnalytics(app);
-
   const messaging = getMessaging(app);
-
-  const db = getFirestore();
-
   const { user } = useAuth();
   
   const router = createBrowserRouter(createRoutesFromElements(
@@ -84,7 +74,6 @@ export default function App() {
         element={
           <>
             <Conversations userId={user?.uid}/>
-            {/* <SignOut /> */}
           </>
         }
         loader={async () => {
@@ -112,20 +101,19 @@ export default function App() {
           return null;
         }}
       />
-      
+
       <Route 
         path="/profile"
         element={<Profile />}
       />
+      
     </>
   ));
   
 
   return (
     <>
-      {/* <AuthProvider> */}
-        <RouterProvider router={router} />
-      {/* </AuthProvider> */}
+      <RouterProvider router={router} />
     </>
   )
 }

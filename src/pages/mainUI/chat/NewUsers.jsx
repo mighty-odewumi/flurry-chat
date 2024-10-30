@@ -41,6 +41,11 @@ export default function NewUsers() {
     <>
       <div>
         <h2 className="text-xl font-semibold mb-4">flurries</h2>
+        {(newUsers.length < 1) && 
+          <div>
+            Loading...
+          </div>
+        }
         <div className="flex space-x-4 overflow-x-auto pb-2">
           {newUsers.map((newUser) => {
             // Using Users' names to form the image for now.

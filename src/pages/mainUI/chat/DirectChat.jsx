@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { addDoc, collection, getFirestore, doc, serverTimestamp, updateDoc, setDoc, getDoc, query, orderBy, onSnapshot,} from "firebase/firestore";
 import { useEffect, useRef, useState,} from "react";
-import { useFetcher, useActionData, Link, useNavigate } from "react-router-dom";
+import { useFetcher, useActionData, Link, useNavigate,  } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import Messages from "./Messages";
 import { useAuth } from "../../../auth/AuthContext";
@@ -107,7 +107,7 @@ export async function action({ request }) {
 
 
 // eslint-disable-next-line react/prop-types
-export default function DirectChat() {
+export default function DirectChat({ }) {
   const [messages, setMessages] = useState([]);
 
   const fetcher = useFetcher();
@@ -174,62 +174,73 @@ export default function DirectChat() {
     scrollToBottom();
   }, [messages])
 
+
   return (
-    <div className="flex h-screen flex-col">
-
-      <header className="flex items-center p-4 border-b border-gray-200">
-        <button className="mr-4" onClick={() => navigate("/conversations")}>
-          <ArrowLeft className="h-6 w-6 text-gray-600" />
-        </button>
-        <ChatAvatar src={Image} alt={recipientName} className="mr-3" />
-        <h1 className="text-lg font-semibold flex-grow">{recipientName}</h1>
-        <button className="ml-2" >
-          <MoreVertical className="h-6 w-6 text-gray-600" />
-        </button>
-      </header>
-
-      <main className="flex-grow overflow-y-auto p-4 flex flex-col-reverse">
-        <div ref={messagesEndRef} />
-        
-        {messages.slice().reverse().map((msg) => (
-          <Messages 
-            msg={msg}
-            key={msg.id}
-            user={user}
-            avatar={Image}
-          />
-
-        ))}
-        <div className="text-center text-sm text-gray-500 my-2">Today</div>
-
-      </main>
-
-      <footer className="p-4 border-t border-gray-200">
-        <fetcher.Form 
-          className="flex items-center bg-gray-100 rounded-full"
-          method="POST"        
-        >
-          <input
-            type="text"
-            className="flex-grow bg-transparent px-4 py-2 focus:outline-none"
-            // value={inputMessage}
-            name="message" 
-            id="message" 
-            placeholder="Type your message here..."
-            value={ isComplete ? "" : status }
-            // onChange={(e) => setInputMessage(e.target.value)}
-            // onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-          />
-          <button 
-            className="p-2" 
-            // onClick={handleSendMessage}
-          >
-            <Send className="h-6 w-6 text-blue-500" />
+    <>
+    
+      <div className="flex h-screen flex-col">
+        <header className="flex items-center p-4 border-b border-gray-200">
+          
+          <button className="mr-4" onClick={() => navigate("/conversations")}>
+            <ArrowLeft className="h-6 w-6 text-gray-600" />
           </button>
-        </fetcher.Form>
-      </footer>
+          
+          <ChatAvatar src={Image} alt={recipientName} className="mr-3 w-8 h-8" />
+          <h1 className="text-lg font-semibold flex-grow">{recipientName}</h1>
+          <Link
+            to={{
+              pathname: '/profile',
+              search: `?userId=${recipientId}`
+            }}
+          >
+            <button className="ml-2"  >
+              <MoreVertical className="h-6 w-6 text-gray-600" />
+            </button>
+          </Link>
+        </header>
 
-      
-    </div>
+        <main className="flex-grow overflow-y-auto p-4 flex flex-col-reverse">
+          <div ref={messagesEndRef} />
+          
+          {messages.slice().reverse().map((msg) => (
+            <Messages 
+              msg={msg}
+              key={msg.id}
+              user={user}
+              avatar={Image}
+            />
+
+          ))}
+          <div className="text-center text-sm text-gray-500 my-2">Today</div>
+
+        </main>
+
+        <footer className="p-4 border-t border-gray-200">
+          <fetcher.Form 
+            className="flex items-center bg-gray-100 rounded-full"
+            method="POST"        
+          >
+            <input
+              type="text"
+              className="flex-grow bg-transparent px-4 py-2 focus:outline-none"
+              // value={inputMessage}
+              name="message" 
+              id="message" 
+              placeholder="Type your message here..."
+              value={ isComplete ? "" : status }
+              // onChange={(e) => setInputMessage(e.target.value)}
+              // onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+            />
+            <button 
+              className="p-2" 
+              // onClick={handleSendMessage}
+            >
+              <Send className="h-6 w-6 text-blue-500" />
+            </button>
+          </fetcher.Form>
+        </footer>
+      </div>
+
+    </>
   );
 }

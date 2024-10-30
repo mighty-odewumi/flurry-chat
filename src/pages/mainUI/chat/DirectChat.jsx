@@ -28,7 +28,6 @@ async function createConversation(senderId, recipientId, text, senderName, recip
       lastMessage: "",
     });
 
-    // console.log("Conversation created", newConversationRef.id);
     return newConversationRef.id;
   } catch (error) {
     console.log("Unable to create conversation", error);
@@ -55,7 +54,6 @@ async function sendMessage(senderId, recipientId, text, recipientName, senderNam
 
     // // Update the conversation's lastMessage and lastMessageTimestamp fields
     const conversationRef = doc(db, `conversations/${conversationId}`);
-    console.log("Text is", text);
     const conversationDoc = await getDoc(conversationRef);
 
     if (conversationDoc.exists()) {
@@ -72,7 +70,7 @@ async function sendMessage(senderId, recipientId, text, recipientName, senderNam
         lastMessageTimestamp: serverTimestamp(),
       });
     }
-    
+
     console.log("Message sent successfully");
   } catch (error) {
       console.log("Error occurred while sending message!", error);
@@ -177,7 +175,6 @@ export default function DirectChat({ }) {
 
   const groupedMessages = groupMessagesByDate(messages);
 
-  
   return (
     <>
     
@@ -202,42 +199,25 @@ export default function DirectChat({ }) {
           </Link>
         </header>
 
-        <main className="flex-grow overflow-y-auto p-4 flex flex-col-reverse">
+        <main className="flex-grow overflow-y-auto p-4 flex flex-col">
+        
+          {groupedMessages.map((group) => (
+            <div key={group.label}>
+              <div className="text-center text-sm text-gray-500 my-2">{group.label}</div>
+
+              {group.messages.map((msg) => (
+                <Messages 
+                  msg={msg}
+                  key={msg.id}
+                  user={user}
+                  avatar={Image}
+                />
+              ))}
+              
+            </div>
+          ))}
+
           <div ref={messagesEndRef} />
-          
-          {groupedMessages.map((group, index) => (
-           <>
-            {group.messages.slice().reverse().map((msg) => (
-              <>
-              <Messages 
-                msg={msg}
-                key={msg.id}
-                user={user}
-                avatar={Image}
-              />
-
-          </>
-          ))}
-          <div className="text-center text-sm text-gray-500 my-2">{group.label}</div>
-
-            </>
-
-          ))}
-
-          
-          {/* {messages.slice().reverse().map((msg) => (
-            <>
-              <Messages 
-                msg={msg}
-                key={msg.id}
-                user={user}
-                avatar={Image}
-              />
-
-          </>
-          ))} */}
-          {/* <div className="text-center text-sm text-gray-500 my-2">Today</div> */}
-
         </main>
 
         <footer className="p-4 border-t border-gray-200">
@@ -248,17 +228,13 @@ export default function DirectChat({ }) {
             <input
               type="text"
               className="flex-grow bg-transparent px-4 py-2 focus:outline-none"
-              // value={inputMessage}
               name="message" 
               id="message" 
               placeholder="Type your message here..."
               value={ isComplete ? "" : status }
-              // onChange={(e) => setInputMessage(e.target.value)}
-              // onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
             />
             <button 
               className="p-2" 
-              // onClick={handleSendMessage}
             >
               <Send className="h-6 w-6 text-blue-500" />
             </button>

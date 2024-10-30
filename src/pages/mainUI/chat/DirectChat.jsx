@@ -8,6 +8,7 @@ import { useAuth } from "../../../auth/AuthContext";
 import { ArrowLeft, MoreVertical, Send } from 'lucide-react';
 import Image from "../../../assets/splash-assets/splash3.jpg";
 import ChatAvatar from "./components/avatars/ChatAvatar";
+import { groupMessagesByDate } from "../../../utils/groupMessagesByDate";
 
 
 // Create conversation
@@ -174,7 +175,9 @@ export default function DirectChat({ }) {
     scrollToBottom();
   }, [messages])
 
+  const groupedMessages = groupMessagesByDate(messages);
 
+  
   return (
     <>
     
@@ -202,16 +205,38 @@ export default function DirectChat({ }) {
         <main className="flex-grow overflow-y-auto p-4 flex flex-col-reverse">
           <div ref={messagesEndRef} />
           
-          {messages.slice().reverse().map((msg) => (
-            <Messages 
-              msg={msg}
-              key={msg.id}
-              user={user}
-              avatar={Image}
-            />
+          {groupedMessages.map((group, index) => (
+           <>
+            {group.messages.slice().reverse().map((msg) => (
+              <>
+              <Messages 
+                msg={msg}
+                key={msg.id}
+                user={user}
+                avatar={Image}
+              />
+
+          </>
+          ))}
+          <div className="text-center text-sm text-gray-500 my-2">{group.label}</div>
+
+            </>
 
           ))}
-          <div className="text-center text-sm text-gray-500 my-2">Today</div>
+
+          
+          {/* {messages.slice().reverse().map((msg) => (
+            <>
+              <Messages 
+                msg={msg}
+                key={msg.id}
+                user={user}
+                avatar={Image}
+              />
+
+          </>
+          ))} */}
+          {/* <div className="text-center text-sm text-gray-500 my-2">Today</div> */}
 
         </main>
 

@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { Bell, LogOut, Search, Settings, User } from 'lucide-react';
 import Avatar from './components/avatars/Avatar';
 import Image from "../../../assets/splash-assets/splash5.jpg";
+import { formatConversationDate } from '../../../utils/dateTimeFormatting/formatConversationDate';
 
 /* We can have a list of predefined avatars and have users choose from them first during signup */
 
@@ -68,7 +69,7 @@ const Conversations = ({userId}) => {
             uid: otherParticipantId,
             username: userData.username || "Unknown",
             lastMessage: data.lastMessage || "",
-            lastMessageTimestamp: data.lastMessageTimestamp ? data.lastMessageTimestamp.toDate() : new Date(),
+            lastMessageTimestamp: data.lastMessageTimestamp ? formatConversationDate(data.lastMessageTimestamp.toDate()) : new Date(),
           });
         }
       }
@@ -161,7 +162,7 @@ const Conversations = ({userId}) => {
                     <p className="text-gray-600 text-sm">{lastMessage}</p>
                   </div>
                   <div className="flex flex-col items-end">
-                    <span className="text-gray-400 text-sm">{lastMessageTimestamp?.toLocaleDateString()}</span>
+                    <span className="text-gray-400 text-sm">{lastMessageTimestamp}</span>
                     {chat?.unread > 0 && (
                       <span className="bg-blue-500 text-white text-xs rounded-full px-2 py-1 mt-1">
                         {chat?.unread}

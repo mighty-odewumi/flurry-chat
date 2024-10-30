@@ -1,6 +1,5 @@
 /* eslint-disable react/prop-types */
 import ChatAvatar from "./components/avatars/ChatAvatar";
-import { formatMessageTime } from "../../../utils/dateTimeFormatting/formatMessageTime";
 import { getTimeForMessage } from "../../../utils/dateTimeFormatting/getTimeForMessage";
 
 // The avatar is normally supposed to be from the recipient user info that we'll obtain this for now, this works.

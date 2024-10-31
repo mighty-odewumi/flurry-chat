@@ -177,7 +177,6 @@ export default function DirectChat({ }) {
 
   return (
     <>
-    
       <div className="flex h-screen flex-col">
         <header className="flex items-center p-4 border-b border-gray-200">
           
@@ -199,7 +198,7 @@ export default function DirectChat({ }) {
           </Link>
         </header>
 
-        <main className="flex-grow overflow-y-auto p-4 flex flex-col">
+        <main className="flex-grow overflow-y-auto p-4 flex flex-col mb-14">
         
           {groupedMessages.map((group) => (
             <div key={group.label}>
@@ -220,7 +219,7 @@ export default function DirectChat({ }) {
           <div ref={messagesEndRef} />
         </main>
 
-        <footer className="p-4 border-t border-gray-200">
+        <footer className="p-4 border-t fixed bottom-0 left-0 right-0 border-gray-200 bg-white">
           <fetcher.Form 
             className="flex items-center bg-gray-100 rounded-full"
             method="POST"        

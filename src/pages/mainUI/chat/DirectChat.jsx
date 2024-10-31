@@ -1,11 +1,11 @@
 /* eslint-disable react/prop-types */
-import { addDoc, collection, getFirestore, doc, serverTimestamp, updateDoc, setDoc, getDoc, query, orderBy, onSnapshot,} from "firebase/firestore";
 import { useEffect, useRef, useState,} from "react";
 import { useFetcher, useActionData, Link, useNavigate,  } from "react-router-dom";
+import { ArrowLeft, MessageSquarePlus, MoreVertical, Send } from 'lucide-react';
+import { addDoc, collection, getFirestore, doc, serverTimestamp, updateDoc, setDoc, getDoc, query, orderBy, onSnapshot,} from "firebase/firestore";
 import { v4 as uuidv4 } from "uuid";
 import Messages from "./Messages";
 import { useAuth } from "../../../auth/AuthContext";
-import { ArrowLeft, MessageSquarePlus, MoreVertical, Send } from 'lucide-react';
 import Image from "../../../assets/splash-assets/splash3.jpg";
 import ChatAvatar from "./components/avatars/ChatAvatar";
 import { groupMessagesByDate } from "../../../utils/groupMessagesByDate";
@@ -120,9 +120,6 @@ export default function DirectChat() {
   const messagesEndRef = useRef(null); // Set a ref to update the UI to the bottom of the chat list.
 
   const isComplete = fetcher.state === "submitting";
-  const actionData = useActionData();
-  console.log("Action data", actionData);
-
   const searchParams = location.search;
   const queryParams = new URLSearchParams(searchParams);
   const recipientId = queryParams.get("recipientId");
@@ -167,7 +164,6 @@ export default function DirectChat() {
    
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversationId, user, recipientId]);
-  console.log("Messages", messages);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });

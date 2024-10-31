@@ -106,7 +106,7 @@ const Profile = () => {
         </main>
 
         {isCurrentUser && (
-          <footer className="fixed bottom-0 left-0 right-0 p-4 border-t border-gray-200">
+          <footer className="fixed bottom-0 left-0 right-0 p-4 border-t border-gray-200 bg-white">
             <button className="w-full bg-blue-500 text-white py-2 px-4 rounded-full flex items-center justify-center">
               <Edit2 className="h-5 w-5 mr-2" />
               Edit Profile

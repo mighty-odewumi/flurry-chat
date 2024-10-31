@@ -7,6 +7,7 @@ import { Bell, LogOut, Search, Settings, User } from 'lucide-react';
 import Avatar from './components/avatars/Avatar';
 import Image from "../../../assets/splash-assets/splash5.jpg";
 import { formatConversationDate } from '../../../utils/dateTimeFormatting/formatConversationDate';
+import logOut from '../../../auth/logOut';
 
 /* We can have a list of predefined avatars and have users choose from them first during signup */
 
@@ -29,7 +30,8 @@ const DropdownMenu = ({ isOpen, onClose, userId }) => {
         Profile Settings
       </Link>
       <button 
-        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+        className="block px-4 py-2 text-sm text-gray-100 hover:bg-gray-400 w-full text-left bg-red-400"
+        onClick={logOut}
       >
         <LogOut className="inline-block mr-2 h-4 w-4" />
         Logout
@@ -91,7 +93,7 @@ const Conversations = ({userId}) => {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-white">
+    <div className="flex flex-col h-screen bg-white" >
       <header className="flex justify-between items-center p-4 border-b border-gray-200 bg-facebookblue">
         <h1 className="text-2xl text-white font-bold">flurry</h1>
         <div className="flex items-center space-x-2">
@@ -105,6 +107,7 @@ const Conversations = ({userId}) => {
                 className="w-full max-w-xs pl-10 pr-2 py-1 text-sm rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300"
                 autoFocus
                 onBlur={() => setIsSearchVisible(false)}
+                onFocus={() => setIsDropdownOpen(false)}
               />
             </div>
             ) : (
@@ -113,7 +116,7 @@ const Conversations = ({userId}) => {
               </button>
             )
           }
-          <div className="relative">
+          <div className="relative" >
             <CurrentUser
               className="h-6 w-6 text-gr ay-600 text-white" 
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}

@@ -3,19 +3,20 @@ import { useState, useEffect } from 'react';
 import { collection, query, where, getFirestore, getDocs, orderBy } from "firebase/firestore";
 import NewUsers from "./NewUsers";
 import { Link } from "react-router-dom";
-import { User } from 'lucide-react';
 import Avatar from './components/avatars/Avatar';
 import Image from "../../../assets/splash-assets/splash5.jpg";
 import { formatConversationDate } from '../../../utils/dateTimeFormatting/formatConversationDate';
 import ConversationsHeader from './ConversationsHeader';
-
+import PreviousConversationsLoader from './PreviousConversationsLoader';
 
 
 const Conversations = ({userId}) => {
   const [previousConversations, setPreviousConversations] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   async function fetchConversations() {
     try {
+      setIsLoading(true);
       const db = getFirestore();
       const conversationsRef = collection(db, "conversations");
       const conversationsQuery = await getDocs(query(conversationsRef,
@@ -47,6 +48,8 @@ const Conversations = ({userId}) => {
       setPreviousConversations(prevConvoData);
     } catch (error) {
       console.error("Error fetching conversations:", error);
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -80,12 +83,19 @@ const Conversations = ({userId}) => {
         <div>
           <h2 className="text-xl font-semibold mb-4">flurs</h2>
 
-          {(previousConversations.length < 1) && 
-            <div>
-              Start a conversation with a flurry (another user) now! ;)
+          {(previousConversations.length < 1) && !isLoading &&
+            <div className="flex flex-col items-center justify-center h-full text-center p-4">
+              <div className="text-3xl text-gray-600 mb-2">📮</div>
+              <p className="text-lg font-semibold text-gray-700">No Conversations Yet!</p>
+              <p className="text-gray-700 mt-2">
+                Start a conversation with a flurry (another user) now! ⬆ 
+              </p>
             </div>
           }
 
+          {isLoading && 
+            <PreviousConversationsLoader />
+          }
 
           <div className="space-y-4">
             

@@ -1,94 +1,16 @@
 /* eslint-disable react/prop-types */
-import { addDoc, collection, getFirestore, doc, serverTimestamp, updateDoc, setDoc, getDoc, query, orderBy, onSnapshot,} from "firebase/firestore";
 import { useEffect, useRef, useState,} from "react";
-import { useFetcher, useActionData, Link, useNavigate,  } from "react-router-dom";
-import { v4 as uuidv4 } from "uuid";
+import { useFetcher, Link, useNavigate,  } from "react-router-dom";
+import { ArrowLeft, MessageSquarePlus, MoreVertical, Send } from 'lucide-react';
+import { collection, getFirestore, query, orderBy, onSnapshot,} from "firebase/firestore";
 import Messages from "./Messages";
 import { useAuth } from "../../../auth/AuthContext";
-import { ArrowLeft, MoreVertical, Send } from 'lucide-react';
 import Image from "../../../assets/splash-assets/splash3.jpg";
 import ChatAvatar from "./components/avatars/ChatAvatar";
 import { groupMessagesByDate } from "../../../utils/groupMessagesByDate";
+import ChatLoader from "./ChatLoader";
+import { sendMessage, generateConversationId } from "../../../utils/chatFunctions/directChatFunctions";
 
-
-// Create conversation
-async function createConversation(senderId, recipientId, text, senderName, recipientName) {
-  try {
-    const db = getFirestore();
-    const conversationsRef = collection(db, "conversations");
-    const newConversationRef = await addDoc(conversationsRef, {
-      senderId,
-      recipientId,
-      participants: [senderId, recipientId],
-      users: [
-        { id: senderId, name: senderName },
-        { id: recipientId, name: recipientName },
-      ],
-      lastMessageTimestamp: serverTimestamp(),
-      lastMessage: "",
-    });
-
-    return newConversationRef.id;
-  } catch (error) {
-    console.log("Unable to create conversation", error);
-  }
-}
-
-// Sends message
-async function sendMessage(senderId, recipientId, text, recipientName, senderName) {
-  try {
-    const db = getFirestore();
-    await createConversation(senderId, recipientId, text, senderName, recipientName);
-    const eachMessageId = generateMessageId();
-    const conversationId = generateConversationId(senderId, recipientId);
-    const messageRef = collection(db, `conversations/${conversationId}/messages`);
-    
-    // Add message to conversation
-    await addDoc(messageRef, {
-      eachMessageId,
-      text,
-      timestamp: serverTimestamp(),
-      senderId,
-      readBy: [senderId], // Initialize readBy with senderId
-    })
-
-    // // Update the conversation's lastMessage and lastMessageTimestamp fields
-    const conversationRef = doc(db, `conversations/${conversationId}`);
-    const conversationDoc = await getDoc(conversationRef);
-
-    if (conversationDoc.exists()) {
-      await updateDoc(conversationRef, {
-        lastMessage: text,
-        lastMessageTimestamp: serverTimestamp()}, 
-        // {merge: true}, 
-      );
-    } else {
-      // Create conversation with the last message and timestamp
-      await setDoc(conversationRef, {
-        participants: [senderId, recipientId],
-        lastMessage: text,
-        lastMessageTimestamp: serverTimestamp(),
-      });
-    }
-
-    console.log("Message sent successfully");
-  } catch (error) {
-      console.log("Error occurred while sending message!", error);
-      throw error;
-  }
-}
-
-// Generates the conversation ID from user IDs
-// eslint-disable-next-line react-refresh/only-export-components
-export function generateConversationId(senderId, recipientId) {
-  return [senderId, recipientId].sort().join("_");
-}
-
-// Generates the message ID randomly
-// eslint-disable-next-line react-refresh/only-export-components
-export function generateMessageId() {
-  return uuidv4();
-}
 
 // eslint-disable-next-line react-refresh/only-export-components
 export async function action({ request }) {
@@ -106,8 +28,9 @@ export async function action({ request }) {
 
 
 // eslint-disable-next-line react/prop-types
-export default function DirectChat({ }) {
+export default function DirectChat() {
   const [messages, setMessages] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetcher = useFetcher();
   const status = fetcher.formData?.get("message");
@@ -118,9 +41,6 @@ export default function DirectChat({ }) {
   const messagesEndRef = useRef(null); // Set a ref to update the UI to the bottom of the chat list.
 
   const isComplete = fetcher.state === "submitting";
-  const actionData = useActionData();
-  console.log("Action data", actionData);
-
   const searchParams = location.search;
   const queryParams = new URLSearchParams(searchParams);
   const recipientId = queryParams.get("recipientId");
@@ -147,13 +67,15 @@ export default function DirectChat({ }) {
             }));
             // console.log(messageData);
           setMessages(messageData);
+          setIsLoading(false);
         });
 
         return () => unsubscribe(); // Unsubscribe from real-time updates after unmount
 
       } catch (error) {
           console.log("Error fetching messages:", error);
-      }
+          setIsLoading(false);
+      } 
     }
 
     if (conversationId) {      
@@ -163,7 +85,6 @@ export default function DirectChat({ }) {
    
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversationId, user, recipientId]);
-  console.log("Messages", messages);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -200,6 +121,20 @@ export default function DirectChat({ }) {
 
         <main className="flex-grow overflow-y-auto p-4 flex flex-col mb-14">
         
+          {isLoading && <ChatLoader />}
+
+          {messages.length === 0 && 
+            <div className="flex flex-col items-center justify-center h-full text-center space-y-4 p-6">
+              <MessageSquarePlus className="h-12 w-12 text-blue-500" />
+              
+              <p className="text-gray-600 text-lg font-medium">No Messages Yet</p>
+
+              <p className="text-gray-500">
+                Send a message and connect with others!
+              </p>
+            </div>
+          }
+
           {groupedMessages.map((group) => (
             <div key={group.label}>
               <div className="text-center text-sm text-gray-500 my-2">{group.label}</div>
@@ -215,7 +150,7 @@ export default function DirectChat({ }) {
               
             </div>
           ))}
-
+        
           <div ref={messagesEndRef} />
         </main>
 

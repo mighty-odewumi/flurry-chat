@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { LogOut, Search, User, Settings, } from "lucide-react";
 import logOut from '../../../auth/logOut';
 
+
+/* We can have a list of predefined avatars and have users choose from them first during signup */
 const CurrentUser = ({onClick, className}) => (
   <div
     className={`cursor-pointer`}
@@ -13,7 +15,7 @@ const CurrentUser = ({onClick, className}) => (
 );
 
 // eslint-disable-next-line react/prop-types, react/display-name
-const DropdownMenu = forwardRef((_props, ref) => {
+const DropdownMenu = forwardRef(({handleLogoutClick}, ref,) => {
   return (
     <div 
       ref={ref} 
@@ -25,7 +27,7 @@ const DropdownMenu = forwardRef((_props, ref) => {
       </Link>
       <button 
         className="block px-4 py-2 text-sm text-gray-100 hover:bg-gray-400 w-full text-left bg-red-400"
-        onClick={logOut}
+        onClick={handleLogoutClick}     
       >
         <LogOut className="inline-block mr-2 h-4 w-4" />
         Logout
@@ -37,8 +39,22 @@ const DropdownMenu = forwardRef((_props, ref) => {
 export default function ConversationsHeader() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isSearchVisible, setIsSearchVisible] = useState(false);
+  const [showLogoutPrompt, setShowLogoutPrompt] = useState(false);
 
   const dropdownRef = useRef(null);
+
+  const handleLogoutClick = () => {
+    setShowLogoutPrompt(true);
+  };
+
+  const confirmLogout = () => {
+    setShowLogoutPrompt(false);
+    logOut();
+  };
+
+  const cancelLogout = () => {
+    setShowLogoutPrompt(false);
+  };
 
   const toggleDropdown = () => {
     setIsDropdownOpen((prev) => !prev);
@@ -93,8 +109,38 @@ export default function ConversationsHeader() {
           />
           {isDropdownOpen && <DropdownMenu 
             ref={dropdownRef}
+            handleLogoutClick={handleLogoutClick}
           />}
         </div>
+
+        {/* <button
+          onClick={handleLogoutClick}
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+        >
+          Logout
+        </button> */}
+
+        {showLogoutPrompt && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full text-center">
+              <p className="text-lg mb-4">Are you sure you want to log out?</p>
+              <div className="flex justify-around">
+                <button
+                  onClick={confirmLogout}
+                  className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
+                >
+                  Yes, log out
+                </button>
+                <button
+                  onClick={cancelLogout}
+                  className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </header>
   )

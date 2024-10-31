@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { redirect, useActionData, useLoaderData, useNavigate, useNavigation } from "react-router-dom";
+import { useActionData, useLoaderData, useNavigate, useNavigation } from "react-router-dom";
 import Onboarding from "./Onboarding";
 import { authSignUp } from "../../auth/authSignUp";
 import { useEffect } from "react";
@@ -10,13 +10,11 @@ export async function loader({ request }) {
   return null;
 }
 
-
 export async function action({ request }) {
   const formData = await request.formData();
   const email = formData.get("email");
   const password = formData.get("password");
   const username = formData.get("username");
-  console.log(email, password, username);
 
   const errors = {};
 
@@ -37,30 +35,24 @@ export async function action({ request }) {
   }
 
   try {
-    const data = await authSignUp(email, password, username);
-    console.log(data);
-   
-    // console.log(localStorage);
-
+    await authSignUp(email, password, username);
   } catch (err) {
-      console.log(err);
       errors.firebaseErr = "An unknown error occurred!", err;
 
       if (err?.errorCode === "auth/network-request-failed") {
         errors.firebaseErr = "You seem to be offline!";
       }
 
-      if (err?.errorCode === "auth/invalid-credential") {
+      // Moved previous standalone checks to this to prevent malicious use of checking which accounts are available on the platform.
+      if ((err?.errorCode === "auth/invalid-credential") || 
+      (err?.errorCode === "auth/wrong-password") || 
+      (err?.errorCode === "auth/user-not-found")) {
         errors.firebaseErr = "Invalid password or email supplied!";
-      }
+      } 
 
       if (err?.errorCode === "auth/email-already-in-use") {
-        errors.firebaseErr = "Email already in use!";
-      }      
-
-      if (err?.errorCode === "auth/user-not-found") {
-        errors.firebaseErr = "No such user found!";
-      } 
+        errors.firebaseErr = "Sorry, account creation failed! Please contact support.";
+      }
 
       return errors;
   }
@@ -70,10 +62,7 @@ export async function action({ request }) {
 
 export default function SignUpPage() {
   const auth = getAuth();
-
-  const data = useLoaderData();
-  console.log(data);
-
+  // const data = useLoaderData();
   const errors = useActionData();
   const navigation = useNavigation();
   const navigate = useNavigate();
@@ -81,21 +70,14 @@ export default function SignUpPage() {
   useEffect(() => {
     const observer = onAuthStateChanged(auth, (user) => {
       if (user) {
-        console.log(user);
-        // localStorage.setItem("loggedIn", true);
         return navigate("/conversations", { replace: true });
       } 
-      // else {
-      //     // localStorage.removeItem("loggedIn");
-      //     redirect("/signin?message=You are not signed in!")
-      // }
     });
 
     return () => observer();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate])
   
-
   return (
     <>
       <Onboarding 

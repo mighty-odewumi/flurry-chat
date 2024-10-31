@@ -3,52 +3,20 @@ import { useState, useEffect } from 'react';
 import { collection, query, where, getFirestore, getDocs, orderBy } from "firebase/firestore";
 import NewUsers from "./NewUsers";
 import { Link } from "react-router-dom";
-import { Bell, LogOut, Search, Settings, User } from 'lucide-react';
 import Avatar from './components/avatars/Avatar';
 import Image from "../../../assets/splash-assets/splash5.jpg";
 import { formatConversationDate } from '../../../utils/dateTimeFormatting/formatConversationDate';
-import logOut from '../../../auth/logOut';
 import ConversationsHeader from './ConversationsHeader';
+import PreviousConversationsLoader from './PreviousConversationsLoader';
 
-/* We can have a list of predefined avatars and have users choose from them first during signup */
-
-const CurrentUser = ({onClick, className}) => (
-  <div
-    className={`cursor-pointer`}
-    onClick={onClick}
-  >
-    <User className={`${className}`}/>
-  </div>
-);
-
-const DropdownMenu = ({ isOpen, onClose, userId }) => {
-  if (!isOpen) return null;
-
-  return (
-    <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
-      <Link to={`/profile`} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
-        <Settings className="inline-block mr-2 h-4 w-4" />
-        Profile Settings
-      </Link>
-      <button 
-        className="block px-4 py-2 text-sm text-gray-100 hover:bg-gray-400 w-full text-left bg-red-400"
-        onClick={logOut}
-      >
-        <LogOut className="inline-block mr-2 h-4 w-4" />
-        Logout
-      </button>
-    </div>
-  )
-}
 
 const Conversations = ({userId}) => {
   const [previousConversations, setPreviousConversations] = useState([]);
-  // const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  // const [isSearchVisible, setIsSearchVisible] = useState(false);
-
+  const [isLoading, setIsLoading] = useState(false);
 
   async function fetchConversations() {
     try {
+      setIsLoading(true);
       const db = getFirestore();
       const conversationsRef = collection(db, "conversations");
       const conversationsQuery = await getDocs(query(conversationsRef,
@@ -80,6 +48,9 @@ const Conversations = ({userId}) => {
       setPreviousConversations(prevConvoData);
     } catch (error) {
       console.error("Error fetching conversations:", error);
+      setIsLoading(false);
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -88,10 +59,6 @@ const Conversations = ({userId}) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
-  console.log(previousConversations);
-  if (!previousConversations) {
-    return <div>Loading...</div>
-  }
 
   return (
     <div className="flex flex-col h-screen bg-white" >
@@ -113,12 +80,19 @@ const Conversations = ({userId}) => {
         <div>
           <h2 className="text-xl font-semibold mb-4">flurs</h2>
 
-          {(previousConversations.length < 1) && 
-            <div>
-              Start a conversation with a flurry (another user) now! ;)
+          {(previousConversations.length < 1) && !isLoading &&
+            <div className="flex flex-col items-center justify-center h-full text-center p-4">
+              <div className="text-3xl text-gray-600 mb-2">📮</div>
+              <p className="text-lg font-semibold text-gray-700">No Conversations Yet!</p>
+              <p className="text-gray-700 mt-2">
+                Start a conversation with a flurry (another user) now! ⬆ 
+              </p>
             </div>
           }
 
+          {isLoading && 
+            <PreviousConversationsLoader />
+          }
 
           <div className="space-y-4">
             

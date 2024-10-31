@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../../../auth/AuthContext";
 import Avatar from "../chat/components/avatars/Avatar";
 import Image from "../../../assets/splash-assets/splash11.jpg";
-
+import NewUsersLoader from "../chat/NewUsersLoader";
 
 // eslint-disable-next-line no-unused-vars
 export default function NewUsers() {
@@ -42,10 +42,10 @@ export default function NewUsers() {
       <div>
         <h2 className="text-xl font-semibold mb-4">flurries</h2>
         {(newUsers.length < 1) && 
-          <div>
-            Loading...
-          </div>
+          <NewUsersLoader />
         }
+
+        
         <div className="flex space-x-4 overflow-x-auto pb-2">
           {newUsers.map((newUser) => {
             // Using Users' names to form the image for now.

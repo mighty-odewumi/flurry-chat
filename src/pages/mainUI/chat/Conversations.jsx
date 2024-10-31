@@ -94,7 +94,7 @@ const Conversations = ({userId}) => {
 
   return (
     <div className="flex flex-col h-screen bg-white" >
-      <header className="flex justify-between items-center p-4 border-b border-gray-200 bg-facebookblue">
+      <header className="flex justify-between items-center p-4 border-b border-gray-200 bg-blue-500">
         <h1 className="text-2xl text-white font-bold">flurry</h1>
         <div className="flex items-center space-x-2">
           {/* <Bell className="h-6 w-6 text- gray-600 text-white" /> */}

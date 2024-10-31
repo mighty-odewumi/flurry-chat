@@ -3,49 +3,16 @@ import { useState, useEffect } from 'react';
 import { collection, query, where, getFirestore, getDocs, orderBy } from "firebase/firestore";
 import NewUsers from "./NewUsers";
 import { Link } from "react-router-dom";
-import { Bell, LogOut, Search, Settings, User } from 'lucide-react';
+import { User } from 'lucide-react';
 import Avatar from './components/avatars/Avatar';
 import Image from "../../../assets/splash-assets/splash5.jpg";
 import { formatConversationDate } from '../../../utils/dateTimeFormatting/formatConversationDate';
-import logOut from '../../../auth/logOut';
 import ConversationsHeader from './ConversationsHeader';
 
-/* We can have a list of predefined avatars and have users choose from them first during signup */
 
-const CurrentUser = ({onClick, className}) => (
-  <div
-    className={`cursor-pointer`}
-    onClick={onClick}
-  >
-    <User className={`${className}`}/>
-  </div>
-);
-
-const DropdownMenu = ({ isOpen, onClose, userId }) => {
-  if (!isOpen) return null;
-
-  return (
-    <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
-      <Link to={`/profile`} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
-        <Settings className="inline-block mr-2 h-4 w-4" />
-        Profile Settings
-      </Link>
-      <button 
-        className="block px-4 py-2 text-sm text-gray-100 hover:bg-gray-400 w-full text-left bg-red-400"
-        onClick={logOut}
-      >
-        <LogOut className="inline-block mr-2 h-4 w-4" />
-        Logout
-      </button>
-    </div>
-  )
-}
 
 const Conversations = ({userId}) => {
   const [previousConversations, setPreviousConversations] = useState([]);
-  // const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  // const [isSearchVisible, setIsSearchVisible] = useState(false);
-
 
   async function fetchConversations() {
     try {

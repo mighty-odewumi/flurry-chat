@@ -1,8 +1,8 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
 import chatLogo from "../assets/splash-assets/chat-logo18.png";
-import { useEffect } from "react";
 // import splash from "../assets/splash-assets/splash1.jpg";
 
 
@@ -28,7 +28,7 @@ export default function SplashScreen() {
   return (
     <>
       <div 
-        className="bg-bluegradient flex flex-col gap-1 justify-center items-center h-screen"
+        className="bg-blue-500 flex flex-col gap-1 justify-center items-center h-screen"
       >
         <motion.div
           initial={{ opacity: 0, transform: "translateY(100px)" }}

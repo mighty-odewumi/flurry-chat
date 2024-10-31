@@ -48,6 +48,7 @@ const Conversations = ({userId}) => {
       setPreviousConversations(prevConvoData);
     } catch (error) {
       console.error("Error fetching conversations:", error);
+      setIsLoading(false);
     } finally {
       setIsLoading(false);
     }
@@ -58,10 +59,6 @@ const Conversations = ({userId}) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
-  console.log(previousConversations);
-  if (!previousConversations) {
-    return <div>Loading...</div>
-  }
 
   return (
     <div className="flex flex-col h-screen bg-white" >

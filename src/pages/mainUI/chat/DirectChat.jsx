@@ -5,10 +5,11 @@ import { useFetcher, useActionData, Link, useNavigate,  } from "react-router-dom
 import { v4 as uuidv4 } from "uuid";
 import Messages from "./Messages";
 import { useAuth } from "../../../auth/AuthContext";
-import { ArrowLeft, MoreVertical, Send } from 'lucide-react';
+import { ArrowLeft, MessageSquarePlus, MoreVertical, Send } from 'lucide-react';
 import Image from "../../../assets/splash-assets/splash3.jpg";
 import ChatAvatar from "./components/avatars/ChatAvatar";
 import { groupMessagesByDate } from "../../../utils/groupMessagesByDate";
+import ChatLoader from "./ChatLoader";
 
 
 // Create conversation
@@ -106,8 +107,9 @@ export async function action({ request }) {
 
 
 // eslint-disable-next-line react/prop-types
-export default function DirectChat({ }) {
+export default function DirectChat() {
   const [messages, setMessages] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetcher = useFetcher();
   const status = fetcher.formData?.get("message");
@@ -147,13 +149,15 @@ export default function DirectChat({ }) {
             }));
             // console.log(messageData);
           setMessages(messageData);
+          setIsLoading(false);
         });
 
         return () => unsubscribe(); // Unsubscribe from real-time updates after unmount
 
       } catch (error) {
           console.log("Error fetching messages:", error);
-      }
+          setIsLoading(false);
+      } 
     }
 
     if (conversationId) {      
@@ -200,6 +204,20 @@ export default function DirectChat({ }) {
 
         <main className="flex-grow overflow-y-auto p-4 flex flex-col mb-14">
         
+          {isLoading && <ChatLoader />}
+
+          {messages.length === 0 && 
+            <div className="flex flex-col items-center justify-center h-full text-center space-y-4 p-6">
+              <MessageSquarePlus className="h-12 w-12 text-blue-500" />
+              
+              <p className="text-gray-600 text-lg font-medium">No Messages Yet</p>
+
+              <p className="text-gray-500">
+                Send a message and connect with others!
+              </p>
+            </div>
+          }
+
           {groupedMessages.map((group) => (
             <div key={group.label}>
               <div className="text-center text-sm text-gray-500 my-2">{group.label}</div>
@@ -215,7 +233,7 @@ export default function DirectChat({ }) {
               
             </div>
           ))}
-
+        
           <div ref={messagesEndRef} />
         </main>
 

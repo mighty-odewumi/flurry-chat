@@ -8,6 +8,7 @@ import Avatar from './components/avatars/Avatar';
 import Image from "../../../assets/splash-assets/splash5.jpg";
 import { formatConversationDate } from '../../../utils/dateTimeFormatting/formatConversationDate';
 import logOut from '../../../auth/logOut';
+import ConversationsHeader from './ConversationsHeader';
 
 /* We can have a list of predefined avatars and have users choose from them first during signup */
 
@@ -42,8 +43,8 @@ const DropdownMenu = ({ isOpen, onClose, userId }) => {
 
 const Conversations = ({userId}) => {
   const [previousConversations, setPreviousConversations] = useState([]);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isSearchVisible, setIsSearchVisible] = useState(false);
+  // const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  // const [isSearchVisible, setIsSearchVisible] = useState(false);
 
 
   async function fetchConversations() {
@@ -94,37 +95,9 @@ const Conversations = ({userId}) => {
 
   return (
     <div className="flex flex-col h-screen bg-white" >
-      <header className="flex justify-between items-center p-4 border-b border-gray-200 bg-blue-500">
-        <h1 className="text-2xl text-white font-bold">flurry</h1>
-        <div className="flex items-center space-x-2">
-          {/* <Bell className="h-6 w-6 text- gray-600 text-white" /> */}
-          {isSearchVisible ? (
-            <div className="relative">
-              <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search here..."
-                className="w-full max-w-xs pl-10 pr-2 py-1 text-sm rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300"
-                autoFocus
-                onBlur={() => setIsSearchVisible(false)}
-                onFocus={() => setIsDropdownOpen(false)}
-              />
-            </div>
-            ) : (
-              <button onClick={() => setIsSearchVisible(true)}>
-                <Search className="h-6 w-6 text-white" />
-              </button>
-            )
-          }
-          <div className="relative" >
-            <CurrentUser
-              className="h-6 w-6 text-gr ay-600 text-white" 
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            />
-            <DropdownMenu isOpen={isDropdownOpen} onClose={() => setIsDropdownOpen(false)} userId={userId}/>
-          </div>
-        </div>
-      </header>
+
+      <ConversationsHeader />
+      
       <main className="flex-1 overflow-auto p-4 space-y-6">
         {/*<div className="relative ">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />

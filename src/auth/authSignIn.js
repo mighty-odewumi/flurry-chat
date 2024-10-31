@@ -1,6 +1,5 @@
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
-// Functional React component
 // eslint-disable-next-line react/prop-types, no-unused-vars
 export async function authSignIn(email, password) {
  

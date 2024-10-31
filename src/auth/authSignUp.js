@@ -1,7 +1,6 @@
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { addDoc, collection, getFirestore } from "firebase/firestore";
 
-// Functional React component
 // eslint-disable-next-line react/prop-types
 export async function authSignUp(email, password, username) {
 

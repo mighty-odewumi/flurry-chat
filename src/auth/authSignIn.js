@@ -11,18 +11,18 @@ export async function authSignIn(email, password) {
     .then((userCredential) => {
       const user = userCredential.user;
       
-      console.log("This user is signed in", user);
       return user;
     })
     .catch((err) => {
       const errorCode = err.code;
       const errMsg = err.message;
-      console.log("An error occurred!", errorCode, errMsg);
+      // Removed console logs to deter bad guys a little
+      // console.log("An error occurred!", errorCode, errMsg);
       const signInErrObject = {};
       
       signInErrObject.errorCode = errorCode;
       signInErrObject.errMsg = errMsg;
-      console.log(signInErrObject);
+      // console.log(signInErrObject);
       throw signInErrObject;
     });
 }

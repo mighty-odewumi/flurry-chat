@@ -33,8 +33,7 @@ export async function action({ request }) {
   }
 
   try {
-    const data = await authSignIn(email, password);
-    console.log(data);
+    await authSignIn(email, password);
   } catch (err) {
       errors.firebaseErr = "An unknown error occurred!", err;
 
@@ -42,13 +41,13 @@ export async function action({ request }) {
         errors.firebaseErr = "You seem to be offline!";
       }
 
-      if (err?.errorCode === "auth/invalid-credential") {
+      // Moved previous standalone checks to this to prevent malicious use of checking which accounts are available on the platform.
+      if ((err?.errorCode === "auth/invalid-credential") || 
+      (err?.errorCode === "auth/wrong-password") || 
+      (err?.errorCode === "auth/user-not-found")) {
         errors.firebaseErr = "Invalid password or email supplied!";
-      }    
-
-      if (err?.errorCode === "auth/user-not-found") {
-        errors.firebaseErr = "No such user found!";
       } 
+
       return errors;
   }
 
@@ -71,13 +70,8 @@ export default function SignInPage() {
   useEffect(() => {
     const observer = onAuthStateChanged(auth, (user) => {
       if (user) {
-        console.log(user);
-        // localStorage.setItem("loggedIn", true);
         return navigate("/conversations", { replace: true });
       } 
-      // else {
-      //     // localStorage.removeItem("loggedIn");
-      // }
     });
 
     return () => observer();

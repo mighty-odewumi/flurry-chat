@@ -7,7 +7,7 @@ import Messages from "./Messages";
 import { useAuth } from "../../../auth/AuthContext";
 import Image from "../../../assets/splash-assets/splash3.jpg";
 import ChatAvatar from "./components/avatars/ChatAvatar";
-import { groupMessagesByDate } from "../../../utils/groupMessagesByDate";
+import { groupMessagesByDate } from "../../../utils/dateTimeFormatting/groupMessagesByDate";
 import ChatLoader from "./ChatLoader";
 import { sendMessage, generateConversationId } from "../../../utils/chatFunctions/directChatFunctions";
 

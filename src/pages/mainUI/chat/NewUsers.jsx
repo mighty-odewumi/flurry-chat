@@ -62,7 +62,7 @@ export default function NewUsers() {
                   key={newUser.id} 
                   className="flex flex-col items-center"
                 >
-                  <Avatar src={Image} className="w-12 h-12" />
+                  <Avatar src={newUser.avatar || Image} className="w-12 h-12" />
                   <span className="mt-2 text-sm">{user?.uid === newUser.uid ? "My Account (You)" : newUser.username}</span>
                 </div>
               </Link>

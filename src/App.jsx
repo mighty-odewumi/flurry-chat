@@ -37,6 +37,9 @@ import DirectChat, { action as chatAction } from "./pages/mainUI/chat/DirectChat
 import Conversations from "./pages/mainUI/chat/Conversations";
 import { useAuth } from "./auth/AuthContext";
 import Profile from "./pages/mainUI/userProfile/Profile";
+import ProfileUpdateForm from "./pages/mainUI/fileUpload/ProfileUpdateForm";
+import UserProfileUpdate from "./pages/mainUI/fileUpload/UserProfileUpdate";
+
 // import { saveMessagingDeviceToken } from "./firebase/messaging";
 // import { getAccessToken } from "./utils/getAccessToken";
 // import { notificationCall } from "./utils/notificationCall";
@@ -105,6 +108,11 @@ export default function App() {
       <Route 
         path="/profile"
         element={<Profile />}
+      />
+
+      <Route 
+        path="/profileUpdate"
+        element={<UserProfileUpdate />}
       />
       
     </>

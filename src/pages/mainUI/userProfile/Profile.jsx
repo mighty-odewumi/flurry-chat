@@ -6,7 +6,8 @@ import { useAuth } from "../../../auth/AuthContext";
 import ChatAvatar from "../chat/components/avatars/ChatAvatar";
 import Image from "../../../assets/splash-assets/splash5.jpg";
 import { useLocation } from 'react-router-dom';
-import { getFirestore, collection, query, where, getDocs } from "firebase/firestore";
+// import { getFirestore, collection, query, where, getDocs } from "firebase/firestore";
+import { fetchUserData } from "../../../utils/getProfiles/fetchUserData";
 
 const Profile = () => {
 
@@ -24,30 +25,12 @@ const Profile = () => {
 
   const isCurrentUser = !viewedUserId || user?.uid === viewedUserId;
 
-  const fetchData = async (uid) => {
-    try {
-      const db = getFirestore();
-      const usersRef = collection(db, "users");
-      const q = query(usersRef, where("uid", "==", uid));
-      const querySnapshot = await getDocs(q);
-
-      if (!querySnapshot.empty) {
-        const userDoc = querySnapshot.docs[0];
-        setUserData(userDoc.data());
-      } else {
-        console.log("No user found with such uid");
-      }
-      
-    } catch (error) {
-       console.error("Can't fetch user data!", error);
-      }  
-  }
 
   useEffect(() => {
     if (isCurrentUser) {
-      fetchData(user?.uid);
+      fetchUserData(user?.uid, setUserData);
     } else if (viewedUserId) {
-      fetchData(viewedUserId);
+      fetchUserData(viewedUserId, setUserData);
     }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps

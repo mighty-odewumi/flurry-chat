@@ -10,6 +10,7 @@ import ChatAvatar from "./components/avatars/ChatAvatar";
 import { groupMessagesByDate } from "../../../utils/dateTimeFormatting/groupMessagesByDate";
 import ChatLoader from "./ChatLoader";
 import { sendMessage, generateConversationId } from "../../../utils/chatFunctions/directChatFunctions";
+import { fetchUserData } from "../../../utils/getProfiles/fetchUserData";
 
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -31,6 +32,7 @@ export async function action({ request }) {
 export default function DirectChat() {
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [otherUserData, setOtherUserData] = useState(null);
 
   const fetcher = useFetcher();
   const status = fetcher.formData?.get("message");
@@ -86,6 +88,10 @@ export default function DirectChat() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversationId, user, recipientId]);
 
+  useEffect(() => {
+    fetchUserData(recipientId, setOtherUserData);
+  }, [])
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }
@@ -105,7 +111,7 @@ export default function DirectChat() {
             <ArrowLeft className="h-6 w-6 text-gray-600" />
           </button>
           
-          <ChatAvatar src={Image} alt={recipientName} className="mr-3 w-8 h-8" />
+          <ChatAvatar src={otherUserData?.avatar || Image} alt={recipientName} className="mr-3 w-8 h-8" />
           <h1 className="text-lg font-semibold flex-grow">{recipientName}</h1>
           <Link
             to={{
@@ -144,7 +150,7 @@ export default function DirectChat() {
                   msg={msg}
                   key={msg.id}
                   user={user}
-                  avatar={Image}
+                  avatar={otherUserData?.avatar || Image}
                 />
               ))}
               

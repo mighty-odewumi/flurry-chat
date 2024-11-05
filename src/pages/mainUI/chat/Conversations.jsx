@@ -8,11 +8,15 @@ import Image from "../../../assets/splash-assets/splash5.jpg";
 import { formatConversationDate } from '../../../utils/dateTimeFormatting/formatConversationDate';
 import ConversationsHeader from './ConversationsHeader';
 import PreviousConversationsLoader from './PreviousConversationsLoader';
+import { fetchUserData } from '../../../utils/getProfiles/fetchUserData';
 
 
 const Conversations = ({userId}) => {
   const [previousConversations, setPreviousConversations] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [otherUserId, setOtherUserId] = useState([]);
+  const [userData, setUserData] = useState([]);
+
 
   async function fetchConversations() {
     try {
@@ -41,6 +45,7 @@ const Conversations = ({userId}) => {
             username: userData.username || "Unknown",
             lastMessage: data.lastMessage || "",
             lastMessageTimestamp: data.lastMessageTimestamp ? formatConversationDate(data.lastMessageTimestamp.toDate()) : new Date(),
+            avatar: userData.avatar,
           });
         }
       }
@@ -59,6 +64,13 @@ const Conversations = ({userId}) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
+  // useEffect(() => {
+  //   // setOtherUserId.forEach(id => {
+      
+  //   //   fetchUserData(id, setUserData);
+  //   // });
+  // }, [otherUserId])
+
 
   return (
     <div className="flex flex-col h-screen bg-white" >
@@ -66,15 +78,7 @@ const Conversations = ({userId}) => {
       <ConversationsHeader />
       
       <main className="flex-1 overflow-auto p-4 space-y-6">
-        {/*<div className="relative ">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search here..."
-            className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>*/}
-
+        
         <NewUsers />
        
         <div>
@@ -97,8 +101,9 @@ const Conversations = ({userId}) => {
           <div className="space-y-4">
             
             {previousConversations.map((chat) => {
-              const { uid, username, lastMessage, lastMessageTimestamp } = chat;
-              const userImg = username.slice(0, 2).toUpperCase();
+              const { uid, username, lastMessage, lastMessageTimestamp, avatar } = chat;
+              // setOtherUserId(uid);
+              
 
               return (
                 <Link
@@ -106,7 +111,7 @@ const Conversations = ({userId}) => {
                   className="justify-between mb-4 hover:bg-gray-50 transition-all flex items-center space-x-4"
                   key={uid}
                 >
-                  <Avatar src={Image} className="w-14 h-14"/>
+                  <Avatar src={avatar || Image} className="w-14 h-14"/>
                   <div className="flex-1">
                     <h3 className="font-semibold">{username}</h3>
                     <p className="text-gray-600 text-sm">{lastMessage}</p>

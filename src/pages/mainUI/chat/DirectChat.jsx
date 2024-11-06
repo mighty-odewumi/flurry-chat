@@ -181,7 +181,6 @@ export default function DirectChat() {
           </fetcher.Form>
         </footer>
       </div>
-
     </>
   );
 }

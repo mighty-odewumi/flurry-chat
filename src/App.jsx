@@ -108,11 +108,25 @@ export default function App() {
       <Route 
         path="/profile"
         element={<Profile />}
+        loader={async () => {
+          if (!user) {
+            throw redirect("/signin?message=You are not logged in!");
+          }
+
+          return null;
+        }}
       />
 
       <Route 
         path="/profileUpdate"
         element={<UserProfileUpdate />}
+        loader={async () => {
+          if (!user) {
+            throw redirect("/signin?message=You are not logged in!");
+          }
+
+          return null;
+        }}
       />
       
     </>

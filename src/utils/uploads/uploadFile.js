@@ -12,6 +12,7 @@ export async function uploadProfilePicture(userId, file) {
 
   if (error) {
     console.error('Error uploading avatar:', error);
+    alert("Error uploading your profile picture!");
     return null;
   }
 
@@ -20,7 +21,7 @@ export async function uploadProfilePicture(userId, file) {
 
 // Updates the user’s bio and profile picture URL in Firestore
 export async function updateUserProfile(userId, bio, profilePath) {
-  const profileUrl = supabase.storage.from('avatar').getPublicUrl(profilePath).data.publicUrl;
+  const profileUrl = profilePath && supabase.storage.from('avatar').getPublicUrl(profilePath).data.publicUrl;
   
   const db = getFirestore();
   const usersRef = collection(db, "users");
@@ -33,8 +34,19 @@ export async function updateUserProfile(userId, bio, profilePath) {
   }
 
   const userDoc = querySnapshot.docs[0].ref;
-  await updateDoc(userDoc, {
-    bio,
-    avatar: profileUrl,
-  });
+
+  if (bio && !profilePath) {
+    await updateDoc(userDoc, {
+      bio
+    });
+  } else if (profilePath && !bio) {
+    await updateDoc(userDoc, {
+      avatar: profileUrl
+    });
+  } else {
+      await updateDoc(userDoc, {
+      bio: bio && bio,
+      avatar: profileUrl && profileUrl,
+    });
+  }
 }

@@ -6,7 +6,6 @@ import { useAuth } from "../../../auth/AuthContext";
 import ChatAvatar from "../chat/components/avatars/ChatAvatar";
 import Image from "../../../assets/splash-assets/splash5.jpg";
 import { useLocation } from 'react-router-dom';
-// import { getFirestore, collection, query, where, getDocs } from "firebase/firestore";
 import { fetchUserData } from "../../../utils/getProfiles/fetchUserData";
 
 const Profile = () => {
@@ -58,7 +57,7 @@ const Profile = () => {
                 className="w-32 h-32 rounded-full"
               />
               {isCurrentUser && 
-                <button className="absolute bottom-0 right-0 bg-blue-500 text-white p-2 rounded-full">
+                <button className="absolute bottom-0 right-0 bg-blue-500 text-white p-2 rounded-full" onClick={() => navigate("/profileUpdate")}>
                   <Camera className="h-5 w-5" />
                 </button>
               }
@@ -79,10 +78,6 @@ const Profile = () => {
                   <h3 className="text-lg font-semibold mb-2">Email</h3>
                   <p className="text-gray-700">{userData?.email}</p>
                 </div>
-                <div>
-                  <h3 className="text-lg font-semibold mb-2">Phone</h3>
-                  <p className="text-gray-700">+1 (555) 123-4567</p>
-                </div>
               </>
             )}
           </div>
@@ -90,7 +85,7 @@ const Profile = () => {
 
         {isCurrentUser && (
           <footer className="fixed bottom-0 left-0 right-0 p-4 border-t border-gray-200 bg-white">
-            <button className="w-full bg-blue-500 text-white py-2 px-4 rounded-full flex items-center justify-center">
+            <button className="w-full bg-blue-500 text-white py-2 px-4 rounded-full flex items-center justify-center" onClick={() => navigate("/profileUpdate")}>
               <Edit2 className="h-5 w-5 mr-2" />
               Edit Profile
             </button>

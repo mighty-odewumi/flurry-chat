@@ -37,8 +37,7 @@ import DirectChat, { action as chatAction } from "./pages/mainUI/chat/DirectChat
 import Conversations from "./pages/mainUI/chat/Conversations";
 import { useAuth } from "./auth/AuthContext";
 import Profile from "./pages/mainUI/userProfile/Profile";
-import ProfileUpdateForm from "./pages/mainUI/fileUpload/ProfileUpdateForm";
-import UserProfileUpdate from "./pages/mainUI/fileUpload/UserProfileUpdate";
+import UserProfileUpdate from "./pages/mainUI/profileUpdate/UserProfileUpdate";
 
 // import { saveMessagingDeviceToken } from "./firebase/messaging";
 // import { getAccessToken } from "./utils/getAccessToken";
@@ -108,11 +107,25 @@ export default function App() {
       <Route 
         path="/profile"
         element={<Profile />}
+        loader={async () => {
+          if (!user) {
+            throw redirect("/signin?message=You are not logged in!");
+          }
+
+          return null;
+        }}
       />
 
       <Route 
         path="/profileUpdate"
         element={<UserProfileUpdate />}
+        loader={async () => {
+          if (!user) {
+            throw redirect("/signin?message=You are not logged in!");
+          }
+
+          return null;
+        }}
       />
       
     </>

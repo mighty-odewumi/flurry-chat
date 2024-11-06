@@ -16,11 +16,11 @@ const notification =
     }
   }
 
-export function notificationCall() {
+function notificationCall() {
   fetch("https://fcm.googleapis.com/v1/projects/flurry-chat/messages:send", {
     "method": "POST",
     "headers": {
-      "Authorization": import.meta.env.GOOGLE_APPLICATION_CREDENTIALS,
+      // "Authorization": import.meta.env.GOOGLE_APPLICATION_CREDENTIALS,
       "Content-Type": "application/json",
     },
     "body": JSON.stringify({

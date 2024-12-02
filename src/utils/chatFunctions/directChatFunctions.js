@@ -16,7 +16,7 @@ function generateMessageId() {
 
 
 // Create conversation
-async function createConversation(senderId, recipientId, text, senderName, recipientName) {
+async function createConversation(senderId, recipientId, senderName, recipientName) {
   try {
     const db = getFirestore();
     const conversationsRef = collection(db, "conversations");
@@ -42,7 +42,7 @@ async function createConversation(senderId, recipientId, text, senderName, recip
 export async function sendMessage(senderId, recipientId, text, recipientName, senderName) {
   try {
     const db = getFirestore();
-    await createConversation(senderId, recipientId, text, senderName, recipientName);
+    await createConversation(senderId, recipientId, senderName, recipientName);
     const eachMessageId = generateMessageId();
     const conversationId = generateConversationId(senderId, recipientId);
     const messageRef = collection(db, `conversations/${conversationId}/messages`);

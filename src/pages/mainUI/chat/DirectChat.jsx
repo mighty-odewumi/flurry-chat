@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useRef, useState,} from "react";
-import { useFetcher, Link, useNavigate,  } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { ArrowLeft, MessageSquarePlus, MoreVertical, Send } from 'lucide-react';
 import { collection, getFirestore, query, orderBy, onSnapshot,} from "firebase/firestore";
 import Messages from "./Messages";
@@ -11,22 +11,6 @@ import { groupMessagesByDate } from "../../../utils/dateTimeFormatting/groupMess
 import ChatLoader from "./ChatLoader";
 import { sendMessage, generateConversationId } from "../../../utils/chatFunctions/directChatFunctions";
 import { fetchUserData } from "../../../utils/getProfiles/fetchUserData";
-
-
-// eslint-disable-next-line react-refresh/only-export-components
-export async function action({ request }) {
-  const formData = await request.formData();
-  const message = formData.get("message");
-  const searchParams = location.search;
-  const queryParams = new URLSearchParams(searchParams);
-  const senderId = queryParams.get("senderId");
-  const recipientId = queryParams.get("recipientId");
-  const recipientName = queryParams.get("recipientName");
-  const senderName = queryParams.get("senderName");
-  message && await sendMessage(senderId, recipientId, message, senderName, recipientName);
-  return (senderId, recipientId, senderName, recipientName);  
-}
-
 
 // eslint-disable-next-line react/prop-types
 export default function DirectChat({ selectedConversation, onBack }) {
@@ -91,7 +75,6 @@ export default function DirectChat({ selectedConversation, onBack }) {
     if (!newMessage.trim()) return;
     await sendMessage(senderId, recipientId, newMessage.trim(), senderName, recipientName);
     setNewMessage("");
-    // fetchMessages();
   };
 
   const handleKeyDown = (e) => {
@@ -100,7 +83,6 @@ export default function DirectChat({ selectedConversation, onBack }) {
       handleSendMessage();
     }
   };
-
   
   useEffect(() => {
     scrollToBottom();

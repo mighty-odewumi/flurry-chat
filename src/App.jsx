@@ -33,8 +33,6 @@ import SignUpPage, {
   loader as signUpLoginLoader 
 } from "./pages/authPages/SignUpPage";
 
-import DirectChat, { action as chatAction } from "./pages/mainUI/chat/DirectChat";
-import Conversations from "./pages/mainUI/chat/Conversations";
 import { useAuth } from "./auth/AuthContext";
 import Profile from "./pages/mainUI/userProfile/Profile";
 import UserProfileUpdate from "./pages/mainUI/profileUpdate/UserProfileUpdate";
@@ -87,23 +85,6 @@ export default function App() {
           return null;
         }}
       />
-
-      {/* <Route 
-        path={`/chat`}
-        element={
-          <>
-            <DirectChat />
-          </>
-        }
-        action={chatAction}
-        loader={async () => {
-          if (!user) {
-            throw redirect("/signin?message=You are not logged in!");
-          }
-
-          return null;
-        }}
-      /> */}
 
       <Route 
         path="/profile"

@@ -79,7 +79,7 @@ const Conversations = ({userId, onSelectConversation}) => {
               return (
                 <div 
                   onClick={() => onSelectConversation(chat)}
-                  className="flex items-center justify-between mb-4 hover:bg-gray-100 p-2 transition-all cursor-pointer"
+                  className="flex items-center justify-between mb-4 hover:bg-gray-100 transition-all cursor-pointer"
                   key={uid}
                 >
                   <Avatar src={avatar || Image} className="w-14 h-14 mr-2"/>

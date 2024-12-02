@@ -38,6 +38,7 @@ import Conversations from "./pages/mainUI/chat/Conversations";
 import { useAuth } from "./auth/AuthContext";
 import Profile from "./pages/mainUI/userProfile/Profile";
 import UserProfileUpdate from "./pages/mainUI/profileUpdate/UserProfileUpdate";
+import MainChat from "./pages/mainUI/chat/MainChat";
 
 // import { saveMessagingDeviceToken } from "./firebase/messaging";
 // import { getAccessToken } from "./utils/getAccessToken";
@@ -75,7 +76,7 @@ export default function App() {
         path="/conversations"
         element={
           <>
-            <Conversations userId={user?.uid}/>
+            <MainChat userId={user?.uid}/>
           </>
         }
         loader={async () => {
@@ -87,7 +88,7 @@ export default function App() {
         }}
       />
 
-      <Route 
+      {/* <Route 
         path={`/chat`}
         element={
           <>
@@ -102,7 +103,7 @@ export default function App() {
 
           return null;
         }}
-      />
+      /> */}
 
       <Route 
         path="/profile"

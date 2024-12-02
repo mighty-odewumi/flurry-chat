@@ -2,21 +2,15 @@
 import { useState, useEffect } from 'react';
 import { collection, query, where, getFirestore, getDocs, orderBy } from "firebase/firestore";
 import NewUsers from "./NewUsers";
-import { Link } from "react-router-dom";
 import Avatar from './components/avatars/Avatar';
 import Image from "../../../assets/splash-assets/splash5.jpg";
 import { formatConversationDate } from '../../../utils/dateTimeFormatting/formatConversationDate';
 import ConversationsHeader from './ConversationsHeader';
 import PreviousConversationsLoader from './PreviousConversationsLoader';
-import { fetchUserData } from '../../../utils/getProfiles/fetchUserData';
 
-
-const Conversations = ({userId}) => {
+const Conversations = ({userId, onSelectConversation}) => {
   const [previousConversations, setPreviousConversations] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [otherUserId, setOtherUserId] = useState([]);
-  const [userData, setUserData] = useState([]);
-
 
   async function fetchConversations() {
     try {
@@ -51,6 +45,7 @@ const Conversations = ({userId}) => {
       }
 
       setPreviousConversations(prevConvoData);
+      setIsLoading(false);
     } catch (error) {
       console.error("Error fetching conversations:", error);
       setIsLoading(false);
@@ -64,54 +59,30 @@ const Conversations = ({userId}) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
-  // useEffect(() => {
-  //   // setOtherUserId.forEach(id => {
-      
-  //   //   fetchUserData(id, setUserData);
-  //   // });
-  // }, [otherUserId])
-
 
   return (
-    <div className="flex flex-col h-screen bg-white" >
+    <div className="md:flex flex-col h-screen bg-white md:w-1/3 hi dden border-r border-gray-300" >
 
       <ConversationsHeader />
       
       <main className="flex-1 overflow-auto p-4 space-y-6">
         
-        <NewUsers />
+        <NewUsers userId={userId} onSelectConversation={onSelectConversation} />
        
         <div>
           <h2 className="text-xl font-semibold mb-4">flurs</h2>
 
-          {(previousConversations.length < 1) && !isLoading &&
-            <div className="flex flex-col items-center justify-center h-full text-center p-4">
-              <div className="text-3xl text-gray-600 mb-2">📮</div>
-              <p className="text-lg font-semibold text-gray-700">No Conversations Yet!</p>
-              <p className="text-gray-700 mt-2">
-                Start a conversation with a flurry (another user) now! ⬆ 
-              </p>
-            </div>
-          }
-
-          {isLoading && 
-            <PreviousConversationsLoader />
-          }
-
-          <div className="space-y-4">
-            
+          <div className="space-y-4 mx-auto">
             {previousConversations.map((chat) => {
               const { uid, username, lastMessage, lastMessageTimestamp, avatar } = chat;
-              // setOtherUserId(uid);
-              
 
               return (
-                <Link
-                  to={`/chat?senderId=${userId}&recipientId=${uid}&recipientName=${username}`}
-                  className="justify-between mb-4 hover:bg-gray-50 transition-all flex items-center space-x-4"
+                <div 
+                  onClick={() => onSelectConversation(chat)}
+                  className="flex items-center justify-between mb-4 hover:bg-gray-100 p-2 transition-all cursor-pointer"
                   key={uid}
                 >
-                  <Avatar src={avatar || Image} className="w-14 h-14"/>
+                  <Avatar src={avatar || Image} className="w-14 h-14 mr-2"/>
                   <div className="flex-1">
                     <h3 className="font-semibold">{username}</h3>
                     <p className="text-gray-600 text-sm">{lastMessage}</p>
@@ -124,10 +95,22 @@ const Conversations = ({userId}) => {
                       </span>
                     )}
                   </div>
-                </Link>
+                </div>
               )
             })}
           </div>
+
+          {isLoading && <PreviousConversationsLoader />}
+
+          {(previousConversations.length < 1) && !isLoading &&
+            <div className="flex flex-col items-center justify-center h-full text-center p-4">
+              <div className="text-3xl text-gray-600 mb-2">📮</div>
+              <p className="text-lg font-semibold text-gray-700">No Conversations Yet!</p>
+              <p className="text-gray-700 mt-2">
+                Start a conversation with a flurry (another user) now! ⬆ 
+              </p>
+            </div>
+          }
         </div>
       </main>
     </div>

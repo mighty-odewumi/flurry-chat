@@ -11,7 +11,7 @@ const Messages = ({msg, user, avatar}) => (
     {!(msg.senderId === user?.uid) && avatar && (<ChatAvatar 
         src={avatar} 
         alt="Recipient Avatar" 
-        className="mr-2 h-8 w-8" 
+        className="mr-2 h-8 w-8 ring-2" 
       />)}
     <div className={`${msg.senderId === user?.uid  ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'} rounded-2xl py-2 px-4 max-w-xs`}>
       <p>{msg.text}</p>
